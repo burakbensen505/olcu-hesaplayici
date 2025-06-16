@@ -1,0 +1,21 @@
+{
+  "name": "Mobilya Ölçü Hesaplayıcı",
+  "short_name": "Mobilya Ölçer",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4A90E2",
+  "description": "Mobilya ölçülerini kolayca hesaplayan bir araç.",
+  "icons": [
+    {
+      "src": "images/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "images/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
