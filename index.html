@@ -106,7 +106,7 @@
                 document.getElementById('optimizasyonBilgi').innerHTML = '';
                 document.getElementById('plakaOneriKutusu').classList.add('hidden');
             } else {
-                 projeKabinleri.forEach(k => {
+                projeKabinleri.forEach(k => {
                     const div = document.createElement('div');
                     div.className = 'p-3 border rounded-lg bg-gray-50 flex justify-between items-center';
                     div.innerHTML = `<div><p class="font-semibold">${k.ad} (${k.tip})</p><p class="text-xs text-gray-600">${k.gen}x${k.yuk}x${k.der} cm</p></div><button onclick="kabiniSil(${k.id})" class="btn-danger">Sil</button>`;
@@ -117,58 +117,44 @@
         
         function hesaplaGlobal(){
             const kalinlikCm = malzemeKalinligi / 10;
-            const fugaCm = 0.2; // 2mm kapak arası boşluk
-            const rayBoslukCm = 2.6; // Her iki yan toplam 26mm ray boşluğu
+            const fugaCm = 0.2;
+            const rayBoslukCm = 2.6;
             
             let tumParcalar = projeKabinleri.flatMap(kabin => {
                 let parcalar = [];
-                // AÇIKLAMA: Gövde iç ölçüleri, yan dikmelerin arasına giren üst ve alt tablalara göre hesaplanır. Bu standart bir yöntemdir.
                 const icGenislik = kabin.gen - (kalinlikCm * 2);
                 const icYukseklik = kabin.yuk - (kalinlikCm * 2);
 
-                // Gövde Parçaları (Her Tip İçin Ortak)
                 parcalar.push({ h: kabin.yuk, w: kabin.der, count: 2, ad: 'Yan Dikme'});
                 parcalar.push({ h: icGenislik, w: kabin.der, count: 2, ad: 'Alt/Üst Tabla' });
                 
-                // Arkalık Hesaplaması
                 let arkalikGen, arkalikYuk;
-                // AÇIKLAMA: 'Kanallı (İçe Sıfır)' seçeneği, arkalığın gövdenin iç ölçüleri ile aynı boyutta olduğunu ve genellikle yan/alt/üst tablalara açılan kanala girdiğini varsayar.
-                // Bu yüzden 'içte' ve 'kanallı' seçenekleri aynı sonucu verir. Eğer arkalığı dıştan çakmak isterseniz (sandık tipi), aşağıdaki gibi bir kod kullanabilirsiniz:
-                // arkalikGen = kabin.gen; arkalikYuk = kabin.yuk;
                 if (kabin.arkalikTipi === 'icte' || kabin.arkalikTipi === 'kanalli') {
                     arkalikGen = icGenislik; 
                     arkalikYuk = icYukseklik;
                 }
                 parcalar.push({h: arkalikYuk, w: arkalikGen, count: 1, ad: 'Arkalık'});
                 
-                // Tip'e Özel Parçalar
                 if (kabin.tip === 'cekmeceli' && kabin.cekmece > 0) {
                     const toplamFuga = (kabin.cekmece + 1) * fugaCm;
                     const cekmeceKapakYukseklik = (kabin.yuk - toplamFuga) / kabin.cekmece;
                     const cekmeceKapakGenislik = kabin.gen - (2 * fugaCm);
                     parcalar.push({h: cekmeceKapakYukseklik, w: cekmeceKapakGenislik, count: kabin.cekmece, ad: 'Çekmece Önü'});
                     
-                    // Çekmece Kasası Hesaplaması
-                    const kasaYukseklik = cekmeceKapakYukseklik - 4; // Kasa, kapaktan genellikle biraz daha kısa olur
-                    const kasaDerinlik = 50; // Standart ray boyu varsayılanı
-                    const kasaDisGenislik = icGenislik - rayBoslukCm; // Çekmece kasasının dıştan dışa genişliği
-                    const kasaIcGenislik = kasaDisGenislik - (2 * kalinlikCm); // Kasa yanları arasına giren ön/arka parçanın genişliği
+                    const kasaYukseklik = cekmeceKapakYukseklik - 4;
+                    const kasaDerinlik = 50;
+                    const kasaDisGenislik = icGenislik - rayBoslukCm;
+                    const kasaIcGenislik = kasaDisGenislik - (2 * kalinlikCm);
                     
-                    // Kasa Yanları (2 adet/çekmece)
                     parcalar.push({h: kasaYukseklik, w: kasaDerinlik, count: kabin.cekmece * 2, ad: 'Kasa Yanı'});
-                    // Kasa Ön ve Arka Parçaları (2 adet/çekmece)
                     parcalar.push({h: kasaYukseklik, w: kasaIcGenislik, count: kabin.cekmece * 2, ad: 'Kasa Ön/Arka'});
                     
-                    // DÜZELTME: Eksik olan çekmece arkalığı (tabanı) parçası eklendi.
-                    // Bu hesaplama, kasa ön/arka parçalarının, yan parçaların arasına girdiğini varsayar.
                     const dipGenislik = kasaIcGenislik;
                     const dipDerinlik = kasaDerinlik - (2 * kalinlikCm);
                     parcalar.push({h: dipDerinlik, w: dipGenislik, count: kabin.cekmece, ad: 'Çekmece Dibi'});
 
-                } else { // Standart Kapaklı
-                    // Raflar için arkada 1cm boşluk bırakmak montajı kolaylaştırır.
+                } else {
                     if (kabin.raf > 0) parcalar.push({ h: icGenislik, w: kabin.der - 1, count: kabin.raf, ad: 'Raf' });
-                    // Tam açılır (dıştan) tek kapak hesabı
                     parcalar.push({h: kabin.yuk - (fugaCm*2), w: kabin.gen - (fugaCm*2), count: 1, ad: 'Kapak'});
                 }
                 return parcalar;
@@ -246,4 +232,3 @@
     </script>
 </body>
 </html>
-
