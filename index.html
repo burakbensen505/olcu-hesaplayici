@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ensar Mobilya - Geliştirilmiş Proje Hesaplayıcı</title>
+    <title>Ensar Mobilya - Profesyonel Proje Hesaplayıcı v2</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,10 +11,11 @@
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
         .logo { font-family: 'Teko', sans-serif; }
-        .input-group label, .select-group label { display: block; margin-bottom: 0.5rem; color: #4b5563; font-weight: 500; font-size: 0.875rem; }
+        .card { background-color: white; border-radius: 0.75rem; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); }
+        .input-group label, .select-group label, .checkbox-group label { display: block; margin-bottom: 0.5rem; color: #4b5563; font-weight: 500; font-size: 0.875rem; }
         .input-group input, .select-group select { width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem; transition: border-color 0.2s, box-shadow 0.2s; }
         .input-group input:focus, .select-group select:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4); }
-        .btn { padding: 0.6rem 1rem; border-radius: 0.5rem; font-weight: 600; transition: background-color 0.2s; cursor: pointer; text-align: center; }
+        .btn { padding: 0.6rem 1rem; border-radius: 0.5rem; font-weight: 600; transition: background-color 0.2s; cursor: pointer; text-align: center; border: none; }
         .btn-full { width: 100%; }
         .btn-auto { width: auto; }
         .btn-primary { background-color: #2563eb; color: white; }
@@ -24,78 +25,121 @@
         .btn-success { background-color: #16a34a; color: white; }
         .btn-success:hover { background-color: #15803d; }
         .btn-danger { background-color: #dc2626; color: white; font-size: 0.75rem; padding: 0.25rem 0.5rem;}
-        .card { background-color: white; border-radius: 0.75rem; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); height: 100%; }
+        [type='checkbox'] { width: 1rem; height: 1rem; border-radius: 0.25rem; }
     </style>
 </head>
 <body class="p-4 lg:p-6">
 
-    <header class="max-w-screen-2xl mx-auto mb-6 flex justify-between items-center"><div class="logo text-4xl text-gray-800">ENSAR MOBİLYA</div><div class="text-center"><h1 class="text-2xl lg:text-3xl font-bold text-gray-800">Proje Bazlı Dolap Hesaplayıcı</h1></div><div></div></header>
+    <header class="max-w-screen-2xl mx-auto mb-6 flex justify-between items-center">
+        <div class="logo text-4xl text-gray-800">ENSAR MOBİLYA</div>
+        <div class="text-center"><h1 class="text-2xl lg:text-3xl font-bold text-gray-800">Profesyonel Dolap Hesaplayıcı</h1></div>
+        <div></div>
+    </header>
 
-    <div class="max-w-screen-2xl mx-auto"><div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div class="lg:col-span-3"><div class="card">
-            <h2 class="text-xl font-semibold text-gray-700 border-b pb-3 mb-4">Yeni Kabin Ekle</h2>
-            <div class="space-y-4">
-                <div class="select-group"><label for="kabinTipi">Kabin Tipi</label><select id="kabinTipi" onchange="kabinTipiDegisti()"><option value="standart" selected>Standart Kapaklı</option><option value="cekmeceli">Çekmeceli</option></select></div>
-                <div class="input-group"><label for="kabinAdi">Kabin Adı</label><input type="text" id="kabinAdi" value="Alt Modül"></div>
-                <div class="grid grid-cols-2 gap-3">
-                   <div class="input-group"><label for="genislik">Genişlik(cm)</label><input type="number" id="genislik" value="80"></div>
-                   <div class="input-group"><label for="yukseklik">Yükseklik(cm)</label><input type="number" id="yukseklik" value="72"></div>
-                   <div class="input-group"><label for="derinlik">Derinlik(cm)</label><input type="number" id="derinlik" value="56"></div>
-                   <div id="rafInputDiv" class="input-group"><label for="rafSayisi">Raf Sayısı</label><input type="number" id="rafSayisi" value="1"></div>
-                   <div id="kapakInputDiv" class="input-group"><label for="kapakSayisi">Kapak Sayısı</label><input type="number" id="kapakSayisi" value="2" min="1" max="2"></div>
-                   <div id="cekmeceInputDiv" class="hidden input-group"><label for="cekmeceSayisi">Çekmece Sayısı</label><input type="number" id="cekmeceSayisi" value="3"></div>
+    <div class="max-w-screen-2xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- SOL SÜTUN: AYARLAR VE KABİN EKLEME -->
+            <div class="lg:col-span-3 space-y-6">
+                <!-- Proje Ayarları Kartı -->
+                <div class="card">
+                    <h2 class="text-xl font-semibold text-gray-700 border-b pb-3 mb-4">Proje Ayarları</h2>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="input-group"><label for="govdeKalinligi">Gövde Kalınlığı (mm)</label><input type="number" id="govdeKalinligi" value="18" onchange="hesaplaGlobal()"></div>
+                            <div class="input-group"><label for="arkalikKalinligi">Arkalık Kalınlığı (mm)</label><input type="number" id="arkalikKalinligi" value="3" onchange="hesaplaGlobal()"></div>
+                            <div class="input-group"><label for="testerePayi">Testere Payı (mm)</label><input type="number" id="testerePayi" value="3" step="0.1" onchange="hesaplaGlobal()"></div>
+                            <div class="input-group"><label for="kenarBandi">Kenar Bandı (mm)</label><input type="number" id="kenarBandi" value="0.4" step="0.1" onchange="hesaplaGlobal()"></div>
+                        </div>
+                    </div>
                 </div>
-                <div class="select-group"><label for="arkalikTipi">Arkalık Tipi</label><select id="arkalikTipi"><option value="kanalli" selected>Kanallı (İçe Geçme)</option><option value="icte">Komple İçten</option></select></div>
-                <div class="pt-4"><button onclick="kabiniEkle()" class="btn btn-full btn-primary">Kabini Projeye Ekle</button></div>
+
+                <!-- Yeni Kabin Ekle Kartı -->
+                <div class="card">
+                    <h2 class="text-xl font-semibold text-gray-700 border-b pb-3 mb-4">Yeni Kabin Ekle</h2>
+                    <div class="space-y-4">
+                        <div class="select-group"><label for="kabinTipi">Kabin Tipi</label><select id="kabinTipi" onchange="kabinTipiDegisti()"><option value="standart" selected>Standart Kapaklı</option><option value="cekmeceli">Çekmeceli</option></select></div>
+                        <div class="input-group"><label for="kabinAdi">Kabin Adı</label><input type="text" id="kabinAdi" value="Alt Modül"></div>
+                        <div class="grid grid-cols-2 gap-3">
+                           <div class="input-group"><label for="genislik">Genişlik(cm)</label><input type="number" id="genislik" value="80"></div>
+                           <div class="input-group"><label for="yukseklik">Yükseklik(cm)</label><input type="number" id="yukseklik" value="72"></div>
+                           <div class="input-group"><label for="derinlik">Derinlik(cm)</label><input type="number" id="derinlik" value="56"></div>
+                           <div id="rafInputDiv" class="input-group"><label for="rafSayisi">Raf Sayısı</label><input type="number" id="rafSayisi" value="1"></div>
+                           <div id="kapakInputDiv" class="input-group"><label for="kapakSayisi">Kapak Sayısı</label><input type="number" id="kapakSayisi" value="2" min="1" max="2"></div>
+                           <div id="cekmeceInputDiv" class="hidden input-group"><label for="cekmeceSayisi">Çekmece Sayısı</label><input type="number" id="cekmeceSayisi" value="3"></div>
+                        </div>
+                        <div class="select-group"><label for="arkalikTipi">Arkalık Tipi</label><select id="arkalikTipi"><option value="kanalli" selected>Kanallı (İçe Geçme)</option><option value="icte">Komple İçten</option></select></div>
+                        <div class="checkbox-group flex items-center gap-2 pt-2"><input type="checkbox" id="kenarBantiUygula" checked><label for="kenarBantiUygula" class="mb-0">Kapak/Raflara Kenar Bandı Uygula</label></div>
+                        <div class="pt-2"><button onclick="kabiniEkle()" class="btn btn-full btn-primary">Kabini Projeye Ekle</button></div>
+                    </div>
+                </div>
             </div>
-        </div></div>
-        <div class="lg:col-span-3"><div class="card"><h2 class="text-xl font-semibold text-gray-700 border-b pb-3 mb-4">Proje Kabinleri</h2><div id="projeListesi" class="space-y-3 max-h-[60vh] overflow-y-auto pr-2"></div></div></div>
-        <div class="lg:col-span-6"><div class="card">
-            <div class="flex flex-wrap justify-between items-center border-b pb-3 mb-4 gap-2"><h2 class="text-xl font-semibold text-gray-700">Genel Kesim Listesi</h2><button onclick="hesaplaGlobal()" class="btn btn-auto btn-secondary">Hesapla ve Öneri Al</button></div>
-            <div id="plakaOneriKutusu" class="hidden p-3 mb-4 bg-blue-50 border border-blue-200 rounded-lg text-center"><h3 class="font-semibold text-blue-800">Akıllı Plaka Önerisi</h3><p id="plakaOneriMetni" class="text-sm text-blue-700 my-1"></p><button id="plakaOneriUygulaBtn" class="btn btn-auto btn-success text-xs px-3 py-1">Bu Öneriyi Kullan</button></div>
-            <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                <div><h3 class="font-semibold text-gray-600 mb-2">Toplam Parça Listesi</h3><div class="overflow-auto max-h-[50vh]"><table class="w-full text-left text-sm"><thead class="bg-gray-50 sticky top-0"><tr><th class="p-2 font-semibold text-gray-600">Adet</th><th class="p-2 font-semibold text-gray-600">Parça Adı</th><th class="p-2 font-semibold text-gray-600">Ölçü (BoyxEn)</th></tr></thead><tbody id="kesimListesiBody"></tbody></table></div></div>
-                <div><div class="flex items-center justify-between mb-2"><h3 class="font-semibold text-gray-600">Optimizasyon Şeması</h3><div id="optimizasyonBilgi" class="text-sm text-right"></div></div><div id="canvasContainer" class="bg-gray-200 rounded-md overflow-hidden relative w-full"><canvas id="kesimSemasiCanvas"></canvas></div></div>
-            </div>
-        </div></div>
-    </div></div>
-    <footer class="text-center mt-8 text-sm text-gray-500"><p>Ahmet Burak Karakuş tarafından yapılmıştır.</p></footer>
+
+            <!-- ORTA SÜTUN: PROJE LİSTESİ -->
+            <div class="lg:col-span-3"><div class="card"><h2 class="text-xl font-semibold text-gray-700 border-b pb-3 mb-4">Proje Kabinleri</h2><div id="projeListesi" class="space-y-3 max-h-[80vh] overflow-y-auto pr-2"></div></div></div>
+            
+            <!-- SAĞ SÜTUN: KESİM LİSTELERİ VE OPTİMİZASYON -->
+            <div class="lg:col-span-6"><div class="card space-y-6">
+                <div class="flex flex-wrap justify-between items-center border-b pb-3 gap-2">
+                    <h2 class="text-xl font-semibold text-gray-700">Genel Kesim ve Optimizasyon</h2>
+                    <button onclick="hesaplaGlobal()" class="btn btn-auto btn-secondary">Tümünü Hesapla ve Optimize Et</button>
+                </div>
+
+                <!-- Gövde Optimizasyon Alanı -->
+                <div id="govdeOptimizasyonAlani">
+                    <h3 class="text-lg font-semibold text-gray-600 mb-2">Gövde ve Kapak Kesim Listesi</h3>
+                    <div id="plakaOneriKutusuGovde" class="hidden p-3 mb-4 bg-blue-50 border border-blue-200 rounded-lg text-center"></div>
+                    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                        <div class="overflow-auto max-h-[40vh]"><table class="w-full text-left text-sm"><thead class="bg-gray-50 sticky top-0"><tr><th class="p-2 font-semibold">Adet</th><th class="p-2 font-semibold">Parça Adı</th><th class="p-2 font-semibold">Net Ölçü (BoyxEn)</th></tr></thead><tbody id="kesimListesiBodyGovde"></tbody></table></div>
+                        <div>
+                            <div class="flex items-center justify-between mb-2"><h4 class="font-semibold text-gray-600">Optimizasyon Şeması</h4><div id="optimizasyonBilgiGovde" class="text-sm text-right"></div></div>
+                            <div id="canvasContainerGovde" class="bg-gray-200 rounded-md overflow-hidden relative w-full"><canvas id="kesimSemasiCanvasGovde"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr/>
+
+                <!-- Arkalık Optimizasyon Alanı -->
+                <div id="arkalikOptimizasyonAlani">
+                    <h3 class="text-lg font-semibold text-gray-600 mb-2">Arkalık Kesim Listesi</h3>
+                    <div id="plakaOneriKutusuArkalik" class="hidden p-3 mb-4 bg-purple-50 border border-purple-200 rounded-lg text-center"></div>
+                    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                        <div class="overflow-auto max-h-[40vh]"><table class="w-full text-left text-sm"><thead class="bg-gray-50 sticky top-0"><tr><th class="p-2 font-semibold">Adet</th><th class="p-2 font-semibold">Parça Adı</th><th class="p-2 font-semibold">Net Ölçü (BoyxEn)</th></tr></thead><tbody id="kesimListesiBodyArkalik"></tbody></table></div>
+                        <div>
+                            <div class="flex items-center justify-between mb-2"><h4 class="font-semibold text-gray-600">Optimizasyon Şeması</h4><div id="optimizasyonBilgiArkalik" class="text-sm text-right"></div></div>
+                            <div id="canvasContainerArkalik" class="bg-gray-200 rounded-md overflow-hidden relative w-full"><canvas id="kesimSemasiCanvasArkalik"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div></div>
+        </div>
+    </div>
+    <footer class="text-center mt-8 text-sm text-gray-500"><p>Ahmet Burak Karakuş tarafından yapılmıştır. Profesyonel sürüm, mobilyacı geri bildirimleriyle geliştirilmiştir.</p></footer>
 
     <script>
-        const GuillotineShelfPacker = {
+        // --- Guillotine Packer (No changes needed) ---
+        const GuillotineShelfPacker = { /* ... (packer code remains the same as previous version) ... */ 
             pack: function(items, sheetWidth, sheetHeight, allowRotation = true) {
                 let remainingItems = items.map(item => ({...item, original_w: item.w, original_h: item.h, packed: false}));
                 remainingItems.sort((a, b) => b.h - a.h || b.w - a.w);
-
                 let packedItems = [];
                 let currentY = 0;
-
                 while(remainingItems.filter(item => !item.packed).length > 0) {
                     let shelfHeight = 0;
                     let shelfItems = [];
                     let currentX = 0;
-                    
-                    let bestInitialItemIndex = -1;
-                    
                     const firstUnpacked = remainingItems.find(i => !i.packed);
                     if(firstUnpacked) {
-                       if(firstUnpacked.h <= sheetHeight - currentY){
-                           shelfHeight = firstUnpacked.h;
-                       } else if (allowRotation && firstUnpacked.w <= sheetHeight - currentY) {
-                           shelfHeight = firstUnpacked.w;
-                       } else {
-                           break;
-                       }
-                    } else {
-                       break;
-                    }
-                    
+                       if(firstUnpacked.h <= sheetHeight - currentY){ shelfHeight = firstUnpacked.h; } 
+                       else if (allowRotation && firstUnpacked.w <= sheetHeight - currentY) { shelfHeight = firstUnpacked.w; } 
+                       else { break; }
+                    } else { break; }
                     if(currentY + shelfHeight > sheetHeight) break;
-
                     for (let i = 0; i < remainingItems.length; i++) {
                         const item = remainingItems[i];
                         if(item.packed) continue;
-
                         if ((currentX + item.w <= sheetWidth) && (item.h <= shelfHeight)) {
                             item.packed = true;
                             shelfItems.push({item: item, x: currentX, y: currentY, rotated: false});
@@ -107,64 +151,66 @@
                             currentX += item.h;
                         }
                     }
-
                     shelfItems.forEach(packed => {
                         packed.item.fit = {x: packed.x, y: packed.y, rotated: packed.rotated};
                         packedItems.push(packed.item);
                     });
-                    
                     currentY += shelfHeight;
                     if(currentY >= sheetHeight) break;
                 }
-
                 packedItems.forEach(item => {
                     item.w = item.fit.rotated ? item.original_h : item.original_w;
                     item.h = item.fit.rotated ? item.original_w : item.original_h;
                 });
-                
                 return packedItems;
             }
         };
 
+        // --- GLOBAL VARIABLES & CONSTANTS ---
         let projeKabinleri = [];
-        let mevcutPlaka = { w: 183, h: 366 };
-        const MALZEME_KALINLIGI_MM = 18;
+        let projeAyarlari = {};
+        let mevcutPlakaGovde = { ad: "Standart Büyük", w: 183, h: 366 };
+        let mevcutPlakaArkalik = { ad: "Standart Arkalık", w: 210, h: 280 };
+
         const FUGA_CM = 0.2;
         const RAY_BOSLUK_CM = 2.6;
         const CEKMECE_KASA_ARKA_BOSLUK_CM = 6;
         const CEKMECE_KASA_DUSUM_PAYI_CM = 4;
         const RAF_DERINLIK_BOSLUK_CM = 1;
         const ARKALIK_KANAL_PAYI_CM = 1.8;
+        
         const standartPlakalar = [
-            { ad: "Standart Büyük", w: 183, h: 366, alan: 183 * 366 },
-            { ad: "Standart Orta", w: 210, h: 280, alan: 210 * 280 },
-            { ad: "Yarım Plaka", w: 122, h: 244, alan: 122 * 244 },
-            { ad: "Geniş Plaka", w: 210, h: 366, alan: 210 * 366 }
+            { ad: "Standart Büyük", w: 183, h: 366 },
+            { ad: "Standart Orta", w: 210, h: 280 },
+            { ad: "Yarım Plaka", w: 122, h: 244 },
+            { ad: "Geniş Plaka", w: 210, h: 366 }
         ];
 
+        // --- UI FUNCTIONS ---
         function kabinTipiDegisti() {
             const tip = document.getElementById('kabinTipi').value;
-            const rafDiv = document.getElementById('rafInputDiv');
-            const kapakDiv = document.getElementById('kapakInputDiv');
-            const cekmeceDiv = document.getElementById('cekmeceInputDiv');
-            const kabinAdiInput = document.getElementById('kabinAdi');
-            
-            if (tip === 'cekmeceli') {
-                rafDiv.classList.add('hidden');
-                kapakDiv.classList.add('hidden');
-                cekmeceDiv.classList.remove('hidden');
-                kabinAdiInput.value = "Çekmeceli Modül";
-            } else {
-                rafDiv.classList.remove('hidden');
-                kapakDiv.classList.remove('hidden');
-                cekmeceDiv.classList.add('hidden');
-                kabinAdiInput.value = "Alt Modül";
-            }
+            document.getElementById('rafInputDiv').classList.toggle('hidden', tip === 'cekmeceli');
+            document.getElementById('kapakInputDiv').classList.toggle('hidden', tip === 'cekmeceli');
+            document.getElementById('cekmeceInputDiv').classList.toggle('hidden', tip !== 'cekmeceli');
+            document.getElementById('kabinAdi').value = tip === 'cekmeceli' ? "Çekmeceli Modül" : "Alt Modül";
         }
         
         function kabiniEkle() {
-            projeKabinleri.push({id: Date.now(), tip: document.getElementById('kabinTipi').value, ad: document.getElementById('kabinAdi').value || 'İsimsiz', gen: parseFloat(document.getElementById('genislik').value), yuk: parseFloat(document.getElementById('yukseklik').value), der: parseFloat(document.getElementById('derinlik').value), raf: parseInt(document.getElementById('rafSayisi').value), kapak: parseInt(document.getElementById('kapakSayisi').value), cekmece: parseInt(document.getElementById('cekmeceSayisi').value), arkalikTipi: document.getElementById('arkalikTipi').value});
+            projeKabinleri.push({
+                id: Date.now(), 
+                tip: document.getElementById('kabinTipi').value, 
+                ad: document.getElementById('kabinAdi').value || 'İsimsiz', 
+                gen: parseFloat(document.getElementById('genislik').value), 
+                yuk: parseFloat(document.getElementById('yukseklik').value), 
+                der: parseFloat(document.getElementById('derinlik').value), 
+                raf: parseInt(document.getElementById('rafSayisi').value), 
+                kapak: parseInt(document.getElementById('kapakSayisi').value), 
+                cekmece: parseInt(document.getElementById('cekmeceSayisi').value), 
+                arkalikTipi: document.getElementById('arkalikTipi').value,
+                bant: document.getElementById('kenarBantiUygula').checked
+            });
             projeyiGoster();
+            hesaplaGlobal();
         }
         
         function kabiniSil(id) {
@@ -178,11 +224,6 @@
             listeEl.innerHTML = '';
             if (projeKabinleri.length === 0) {
                 listeEl.innerHTML = '<p class="text-gray-500 text-center p-4">Henüz proje yok.</p>';
-                document.getElementById('kesimListesiBody').innerHTML = '';
-                const ctx = document.getElementById('kesimSemasiCanvas').getContext('2d');
-                ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-                document.getElementById('optimizasyonBilgi').innerHTML = '';
-                document.getElementById('plakaOneriKutusu').classList.add('hidden');
             } else {
                 projeKabinleri.forEach(k => {
                     const div = document.createElement('div');
@@ -193,85 +234,150 @@
             }
         }
         
+        // --- CORE CALCULATION ENGINE ---
         function hesaplaGlobal(){
-            const kalinlikCm = MALZEME_KALINLIGI_MM / 10;
-            let tumParcalar = projeKabinleri.flatMap(kabin => {
-                let parcalar = [];
-                const icGenislik = kabin.gen - (kalinlikCm * 2);
-                const icYukseklik = kabin.yuk - (kalinlikCm * 2);
-                parcalar.push({ h: kabin.yuk, w: kabin.der, count: 2, ad: 'Yan Dikme'});
-                parcalar.push({ h: icGenislik, w: kabin.der, count: 2, ad: 'Alt/Üst Tabla' });
-                let arkalikGen, arkalikYuk;
-                if (kabin.arkalikTipi === 'kanalli') {
-                    arkalikGen = icGenislik + ARKALIK_KANAL_PAYI_CM; 
-                    arkalikYuk = icYukseklik + ARKALIK_KANAL_PAYI_CM;
-                } else { 
-                    arkalikGen = icGenislik; 
-                    arkalikYuk = icYukseklik;
-                }
-                parcalar.push({h: arkalikYuk, w: arkalikGen, count: 1, ad: 'Arkalık'});
-                if (kabin.tip === 'cekmeceli' && kabin.cekmece > 0) {
-                    const toplamFuga = (kabin.cekmece + 1) * FUGA_CM;
-                    const cekmeceKapakYukseklik = (kabin.yuk - toplamFuga) / kabin.cekmece;
-                    const cekmeceKapakGenislik = kabin.gen - (2 * FUGA_CM);
-                    parcalar.push({h: cekmeceKapakYukseklik, w: cekmeceKapakGenislik, count: kabin.cekmece, ad: 'Çekmece Önü'});
-                    const kasaYukseklik = cekmeceKapakYukseklik - CEKMECE_KASA_DUSUM_PAYI_CM;
-                    const kasaDerinlik = kabin.der - CEKMECE_KASA_ARKA_BOSLUK_CM;
-                    const kasaDisGenislik = icGenislik - RAY_BOSLUK_CM;
-                    const kasaIcGenislik = kasaDisGenislik - (2 * kalinlikCm);
-                    parcalar.push({h: kasaYukseklik, w: kasaDerinlik, count: kabin.cekmece * 2, ad: 'Kasa Yanı'});
-                    parcalar.push({h: kasaYukseklik, w: kasaIcGenislik, count: kabin.cekmece * 2, ad: 'Kasa Ön/Arka'});
-                    const dipGenislik = kasaIcGenislik;
-                    const dipDerinlik = kasaDerinlik - (2 * kalinlikCm);
-                    parcalar.push({h: dipDerinlik, w: dipGenislik, count: kabin.cekmece, ad: 'Çekmece Dibi'});
-                } else if (kabin.tip === 'standart') {
-                    if (kabin.raf > 0) {
-                        parcalar.push({ h: icGenislik, w: kabin.der - RAF_DERINLIK_BOSLUK_CM, count: kabin.raf, ad: 'Raf' });
-                    }
-                    if (kabin.kapak === 1) {
-                         parcalar.push({h: kabin.yuk - (FUGA_CM * 2), w: kabin.gen - (FUGA_CM * 2), count: 1, ad: 'Kapak'});
-                    } else if (kabin.kapak === 2) {
-                        const ciftKapakGenislik = (kabin.gen - (FUGA_CM * 3)) / 2;
-                        parcalar.push({h: kabin.yuk - (FUGA_CM * 2), w: ciftKapakGenislik, count: 2, ad: 'Kapak'});
-                    }
-                }
-                return parcalar;
-            });
-            const parcaListesi = birlestirVeGrupla(tumParcalar);
-            gosterKesimListesi(parcaListesi);
-            plakaOnerisiYap(parcaListesi);
-            const optimizasyonIcinParcalar = parcaListesi.flatMap(p => 
-                Array(p.count).fill({ w: p.w, h: p.h, ad: p.ad })
-            );
-            optimizeVeCiz(optimizasyonIcinParcalar, mevcutPlaka);
-        }
+            // 1. Proje ayarlarını al ve cm'ye çevir
+            projeAyarlari = {
+                govdeKalinlik: parseFloat(document.getElementById('govdeKalinligi').value) / 10,
+                arkalikKalinlik: parseFloat(document.getElementById('arkalikKalinligi').value) / 10,
+                testerePayi: parseFloat(document.getElementById('testerePayi').value) / 10,
+                bantKalinlik: parseFloat(document.getElementById('kenarBandi').value) / 10
+            };
+            
+            // Başlıkları dinamik olarak güncelle
+            document.querySelector('#govdeOptimizasyonAlani h3').textContent = `Gövde ve Kapak Kesim Listesi (${projeAyarlari.govdeKalinlik*10}mm)`;
+            document.querySelector('#arkalikOptimizasyonAlani h3').textContent = `Arkalık Kesim Listesi (${projeAyarlari.arkalikKalinlik*10}mm)`;
 
-        function plakaOnerisiYap(parcaListesi) {
-            const toplamParcaAlani = parcaListesi.reduce((acc, p) => acc + (p.w * p.h * p.count), 0);
-            if (toplamParcaAlani === 0) { document.getElementById('plakaOneriKutusu').classList.add('hidden'); return; }
-            let enIyiOneri = { verim: 0, plaka: null, plakaSayisi: 0 };
-            standartPlakalar.forEach(plaka => {
-                const gerekenPlakaSayisi = Math.ceil(toplamParcaAlani / plaka.alan);
-                const toplamPlakaAlani = gerekenPlakaSayisi * plaka.alan;
-                const verim = (toplamParcaAlani / toplamPlakaAlani) * 100;
-                if (verim > enIyiOneri.verim) {
-                    enIyiOneri = { verim, plaka, plakaSayisi: gerekenPlakaSayisi };
-                }
-            });
-            const onerikutusu = document.getElementById('plakaOneriKutusu');
-            if (enIyiOneri.plaka) {
-                document.getElementById('plakaOneriMetni').innerHTML = `~${enIyiOneri.plakaSayisi} adet <strong>${enIyiOneri.plaka.ad} (${enIyiOneri.plaka.w}x${enIyiOneri.plaka.h})</strong> plaka ile ~<strong class="text-green-600">%${enIyiOneri.verim.toFixed(0)}</strong> verim alabilirsiniz.`;
-                document.getElementById('plakaOneriUygulaBtn').onclick = () => { mevcutPlaka = enIyiOneri.plaka; hesaplaGlobal(); };
-                onerikutusu.classList.remove('hidden');
-            } else { 
-                onerikutusu.classList.add('hidden');
+
+            if (projeKabinleri.length === 0) {
+                // Proje boşsa temizle ve çık
+                gosterKesimListesi([], 'kesimListesiBodyGovde');
+                gosterKesimListesi([], 'kesimListesiBodyArkalik');
+                optimizeVeCiz('kesimSemasiCanvasGovde', 'optimizasyonBilgiGovde', 'canvasContainerGovde', [], mevcutPlakaGovde);
+                optimizeVeCiz('kesimSemasiCanvasArkalik', 'optimizasyonBilgiArkalik', 'canvasContainerArkalik', [], mevcutPlakaArkalik);
+                document.getElementById('plakaOneriKutusuGovde').classList.add('hidden');
+                document.getElementById('plakaOneriKutusuArkalik').classList.add('hidden');
+                return;
             }
+
+            let tumGovdeParcalari = [];
+            let tumArkalikParcalari = [];
+
+            // 2. Tüm kabinleri gez ve parçaları ayır
+            projeKabinleri.forEach(kabin => {
+                const { govde, arkalik } = kabinParcalarınıHesapla(kabin, projeAyarlari);
+                tumGovdeParcalari.push(...govde);
+                tumArkalikParcalari.push(...arkalik);
+            });
+
+            // 3. Parçaları grupla ve göster
+            const govdeListesi = birlestirVeGrupla(tumGovdeParcalari);
+            const arkalikListesi = birlestirVeGrupla(tumArkalikParcalari);
+            gosterKesimListesi(govdeListesi, 'kesimListesiBodyGovde');
+            gosterKesimListesi(arkalikListesi, 'kesimListesiBodyArkalik');
+
+            // 4. Plaka önerileri yap
+            plakaOnerisiYap(govdeListesi, 'plakaOneriKutusuGovde', 'govde');
+            plakaOnerisiYap(arkalikListesi, 'plakaOneriKutusuArkalik', 'arkalik');
+
+            // 5. Optimizasyon için parçaları hazırla ve çiz
+            const govdeOptimizasyonParcalari = govdeListesi.flatMap(p => 
+                Array(p.count).fill({ w: p.w_kesim, h: p.h_kesim, net_w: p.w, net_h: p.h, ad: p.ad })
+            );
+             const arkalikOptimizasyonParcalari = arkalikListesi.flatMap(p => 
+                Array(p.count).fill({ w: p.w_kesim, h: p.h_kesim, net_w: p.w, net_h: p.h, ad: p.ad })
+            );
+
+            optimizeVeCiz('kesimSemasiCanvasGovde', 'optimizasyonBilgiGovde', 'canvasContainerGovde', govdeOptimizasyonParcalari, mevcutPlakaGovde);
+            optimizeVeCiz('kesimSemasiCanvasArkalik', 'optimizasyonBilgiArkalik', 'canvasContainerArkalik', arkalikOptimizasyonParcalari, mevcutPlakaArkalik);
         }
 
+        function kabinParcalarınıHesapla(kabin, ayarlar) {
+            let govdeParcalari = [];
+            let arkalikParcalari = [];
+            const { govdeKalinlik, arkalikKalinlik, testerePayi, bantKalinlik } = ayarlar;
+
+            const icGenislik = kabin.gen - (govdeKalinlik * 2);
+            const icYukseklik = kabin.yuk - (govdeKalinlik * 2);
+
+            // GÖVDE PARÇALARI
+            govdeParcalari.push({ net_h: kabin.yuk, net_w: kabin.der, count: 2, ad: 'Yan Dikme'});
+            govdeParcalari.push({ net_h: icGenislik, net_w: kabin.der, count: 2, ad: 'Alt/Üst Tabla' });
+            
+            // ARKALI PARÇASI
+            let arkalikGen, arkalikYuk;
+            if (kabin.arkalikTipi === 'kanalli') {
+                arkalikGen = icGenislik + ARKALIK_KANAL_PAYI_CM; 
+                arkalikYuk = icYukseklik + ARKALIK_KANAL_PAYI_CM;
+            } else { 
+                arkalikGen = icGenislik; 
+                arkalikYuk = icYukseklik;
+            }
+            arkalikParcalari.push({net_h: arkalikYuk, net_w: arkalikGen, count: 1, ad: 'Arkalık'});
+            
+            // TİPE GÖRE PARÇALAR
+            if (kabin.tip === 'cekmeceli' && kabin.cekmece > 0) {
+                const toplamFuga = (kabin.cekmece + 1) * FUGA_CM;
+                let cekmeceKapakYukseklik = (kabin.yuk - toplamFuga) / kabin.cekmece;
+                let cekmeceKapakGenislik = kabin.gen - (2 * FUGA_CM);
+                if (kabin.bant) {
+                    cekmeceKapakYukseklik -= (bantKalinlik * 2);
+                    cekmeceKapakGenislik -= (bantKalinlik * 2);
+                }
+                govdeParcalari.push({net_h: cekmeceKapakYukseklik, net_w: cekmeceKapakGenislik, count: kabin.cekmece, ad: 'Çekmece Önü'});
+                
+                // Çekmece kasası (Gövde malzemesinden)
+                const kasaYukseklik = cekmeceKapakYukseklik - CEKMECE_KASA_DUSUM_PAYI_CM;
+                const kasaDerinlik = kabin.der - CEKMECE_KASA_ARKA_BOSLUK_CM;
+                const kasaDisGenislik = icGenislik - RAY_BOSLUK_CM;
+                const kasaIcGenislik = kasaDisGenislik - (2 * govdeKalinlik);
+                govdeParcalari.push({net_h: kasaYukseklik, net_w: kasaDerinlik, count: kabin.cekmece * 2, ad: 'Kasa Yanı'});
+                govdeParcalari.push({net_h: kasaYukseklik, net_w: kasaIcGenislik, count: kabin.cekmece * 2, ad: 'Kasa Ön/Arka'});
+                
+                // Çekmece dibi (Arkalık malzemesinden)
+                const dipGenislik = kasaIcGenislik;
+                const dipDerinlik = kasaDerinlik - (2 * govdeKalinlik);
+                arkalikParcalari.push({net_h: dipDerinlik, net_w: dipGenislik, count: kabin.cekmece, ad: 'Çekmece Dibi'});
+
+            } else if (kabin.tip === 'standart') {
+                if (kabin.raf > 0) {
+                    let rafGen = icGenislik;
+                    let rafDer = kabin.der - RAF_DERINLIK_BOSLUK_CM;
+                    if (kabin.bant) {
+                        rafDer -= bantKalinlik; // Genellikle sadece önü bantlanır
+                    }
+                    govdeParcalari.push({ net_h: rafGen, net_w: rafDer, count: kabin.raf, ad: 'Raf' });
+                }
+                if (kabin.kapak > 0) {
+                    let kapakYuk = kabin.yuk - (FUGA_CM * 2);
+                    if (kabin.bant) kapakYuk -= (bantKalinlik * 2);
+
+                    if (kabin.kapak === 1) {
+                        let kapakGen = kabin.gen - (FUGA_CM * 2);
+                        if (kabin.bant) kapakGen -= (bantKalinlik * 2);
+                        govdeParcalari.push({net_h: kapakYuk, net_w: kapakGen, count: 1, ad: 'Kapak'});
+                    } else if (kabin.kapak === 2) {
+                        let kapakGen = (kabin.gen - (FUGA_CM * 3)) / 2;
+                        if (kabin.bant) kapakGen -= bantKalinlik; // Her kapak bir taraftan bantlanır
+                        govdeParcalari.push({net_h: kapakYuk, net_w: kapakGen, count: 2, ad: 'Kapak'});
+                    }
+                }
+            }
+            
+            // Testere payını ekle
+            const addKerf = (p) => ({ ...p, h: p.net_h, w: p.net_w, h_kesim: p.net_h + testerePayi, w_kesim: p.net_w + testerePayi });
+            
+            return {
+                govde: govdeParcalari.map(addKerf),
+                arkalik: arkalikParcalari.map(addKerf)
+            };
+        }
+
+        // --- HELPER & UTILITY FUNCTIONS ---
         function birlestirVeGrupla(parcalar) {
             const gruplu = {};
             parcalar.forEach(p => {
-                const key = `${p.ad}_${p.h.toFixed(1)}x${p.w.toFixed(1)}`;
+                const key = `${p.ad}_${p.h.toFixed(2)}x${p.w.toFixed(2)}`;
                 if (gruplu[key]) {
                     gruplu[key].count += p.count;
                 } else {
@@ -281,87 +387,143 @@
             return Object.values(gruplu);
         }
 
-        function gosterKesimListesi(parcalar) {
-            const tbody = document.getElementById('kesimListesiBody');
+        function gosterKesimListesi(parcalar, tbodyId) {
+            const tbody = document.getElementById(tbodyId);
             tbody.innerHTML = '';
             parcalar.sort((a,b) => b.h - a.h || b.w - a.w);
             parcalar.forEach(p => { 
                 tbody.innerHTML += `<tr class="border-b last:border-b-0"><td class="p-2 font-bold">${p.count}</td><td class="p-2 font-medium">${p.ad}</td><td class="p-2">${p.h.toFixed(1)}x${p.w.toFixed(1)}</td></tr>`; 
             });
         }
-        
-        function optimizeVeCiz(boxes, plaka) {
-            const canvasContainer = document.getElementById('canvasContainer');
-            canvasContainer.style.aspectRatio = `${plaka.w} / ${plaka.h}`;
-            const canvas = document.getElementById('kesimSemasiCanvas');
-            const ctx = canvas.getContext('2d');
 
-            const resizeCanvas = () => {
+        function plakaOnerisiYap(parcaListesi, kutuId, tip) {
+            const onerikutusu = document.getElementById(kutuId);
+            const toplamParcaAlani = parcaListesi.reduce((acc, p) => acc + (p.w * p.h * p.count), 0);
+            
+            if (toplamParcaAlani === 0) {
+                onerikutusu.classList.add('hidden');
+                return;
+            }
+
+            let enIyiOneri = { verim: 0, plaka: null, plakaSayisi: 0 };
+            standartPlakalar.forEach(plaka => {
+                const plakaAlani = plaka.w * plaka.h;
+                // Bu basit bir yaklaşımdır, gerçek yerleşime göre plaka sayısı değişebilir.
+                // Gerçekçi olması için optimizasyon sonucuna bakmak gerekir ama bu hızlı bir önizlemedir.
+                const gerekenPlakaSayisi = Math.ceil(toplamParcaAlani / plakaAlani);
+                const toplamPlakaAlani = gerekenPlakaSayisi * plakaAlani;
+                const verim = (toplamParcaAlani / toplamPlakaAlani) * 100;
+
+                // Daha az plaka her zaman daha iyidir, sonra verime bak.
+                if (enIyiOneri.plaka === null || gerekenPlakaSayisi < enIyiOneri.plakaSayisi || (gerekenPlakaSayisi === enIyiOneri.plakaSayisi && verim > enIyiOneri.verim)) {
+                    enIyiOneri = { verim, plaka, plakaSayisi: gerekenPlakaSayisi };
+                }
+            });
+            
+            if (enIyiOneri.plaka) {
+                onerikutusu.innerHTML = `<h3 class="font-semibold text-blue-800">Akıllı Plaka Önerisi</h3>
+                                         <p class="text-sm text-blue-700 my-1">~${enIyiOneri.plakaSayisi} adet <strong>${enIyiOneri.plaka.ad} (${enIyiOneri.plaka.w}x${enIyiOneri.plaka.h})</strong> plaka ile ~<strong class="text-green-600">%${enIyiOneri.verim.toFixed(0)}</strong> verim alabilirsiniz.</p>
+                                         <button id="plakaOneriUygulaBtn${tip}" class="btn btn-auto btn-success text-xs px-3 py-1">Bu Öneriyi Kullan</button>`;
+                document.getElementById(`plakaOneriUygulaBtn${tip}`).onclick = () => {
+                    if (tip === 'govde') {
+                        mevcutPlakaGovde = enIyiOneri.plaka;
+                    } else {
+                        mevcutPlakaArkalik = enIyiOneri.plaka;
+                    }
+                    hesaplaGlobal();
+                };
+                onerikutusu.classList.remove('hidden');
+            } else { 
+                onerikutusu.classList.add('hidden');
+            }
+        }
+        
+        function optimizeVeCiz(canvasId, infoId, containerId, boxes, plaka) {
+            const canvasContainer = document.getElementById(containerId);
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            const infoEl = document.getElementById(infoId);
+
+            // Canvas boyutunu ayarla ve yeniden çiz
+            const resizeAndDraw = () => {
+                if (!canvasContainer) return;
                 canvas.width = canvasContainer.clientWidth;
-                canvas.height = canvasContainer.clientHeight;
+                canvas.height = canvasContainer.clientWidth / (plaka.w / plaka.h); // Aspect ratio'yu koru
+                
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
                 if (boxes.length === 0) { 
-                    document.getElementById('optimizasyonBilgi').innerHTML = ''; 
-                    ctx.clearRect(0, 0, canvas.width, canvas.height); 
+                    infoEl.innerHTML = ''; 
                     return; 
                 }
+                
+                const packerInput = boxes.map(b => ({w: b.w, h: b.h, net_w: b.net_w, net_h: b.net_h, ad: b.ad}));
+                const packedItems = GuillotineShelfPacker.pack(packerInput, plaka.w, plaka.h);
 
-                const packedItems = GuillotineShelfPacker.pack(boxes, plaka.w, plaka.h);
-
-                const scale = Math.min(canvas.width / plaka.w, canvas.height / plaka.h);
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                const scale = canvas.width / plaka.w;
                 ctx.strokeStyle = '#9ca3af'; 
-                ctx.lineWidth = 2; 
+                ctx.lineWidth = 1; 
                 ctx.strokeRect(0, 0, plaka.w * scale, plaka.h * scale);
                 
                 let totalArea = 0;
                 packedItems.forEach(box => {
                     if (box.fit) {
-                        ctx.fillStyle = 'rgba(59, 130, 246, 0.7)'; 
-                        ctx.strokeStyle = '#1d4ed8'; 
+                        ctx.fillStyle = box.ad.includes('Arkalık') || box.ad.includes('Dip') ? 'rgba(128, 90, 213, 0.7)' : 'rgba(59, 130, 246, 0.7)'; 
+                        ctx.strokeStyle = box.ad.includes('Arkalık') || box.ad.includes('Dip') ? '#6d28d9' : '#1d4ed8'; 
                         ctx.lineWidth = 1;
 
-                        const draw_w = box.w;
-                        const draw_h = box.h;
+                        // Kesim ölçüleri ile yerleştir, net ölçüler ile çiz
+                        const draw_w = box.fit.rotated ? box.net_h : box.net_w;
+                        const draw_h = box.fit.rotated ? box.net_w : box.net_h;
+                        
                         const [rectX, rectY, rectW, rectH] = [box.fit.x * scale, box.fit.y * scale, draw_w * scale, draw_h * scale];
                         
                         ctx.fillRect(rectX, rectY, rectW, rectH); 
                         ctx.strokeRect(rectX, rectY, rectW, rectH);
                         
-                        // --- YAZI EKLEME KISMI ---
-                        // Sadece kutu yeterince büyükse yazıyı ekle
-                        if (rectW > 50 && rectH > 20) {
+                        // Yazı Ekleme
+                        if (rectW > 40 && rectH > 15) {
                             ctx.fillStyle = '#ffffff';
                             ctx.textAlign = 'center';
                             ctx.textBaseline = 'middle';
                             
-                            const fontSize = Math.min(rectH / 4, 12); // Yazı boyutunu kutuya göre ayarla
+                            const fontSize = Math.min(rectH / 5, 10);
                             ctx.font = `bold ${fontSize}px Inter`;
 
                             const textX = rectX + rectW / 2;
                             const textY = rectY + rectH / 2;
                             
-                            const line1 = box.ad;
-                            const line2 = `${box.original_w.toFixed(1)} x ${box.original_h.toFixed(1)}`;
-                            
-                            ctx.fillText(line1, textX, textY - (fontSize / 2 + 1));
-                            ctx.fillText(line2, textX, textY + (fontSize / 2 + 1));
+                            ctx.fillText(box.ad, textX, textY - (fontSize / 2));
+                            ctx.fillText(`${box.net_w.toFixed(1)}x${box.net_h.toFixed(1)}`, textX, textY + (fontSize / 2) + 2);
                         }
-                        // --- YAZI EKLEME SONU ---
                         
-                        totalArea += box.original_w * box.original_h;
+                        totalArea += box.net_w * box.net_h;
                     }
                 });
+
                 const efficiency = (totalArea / (plaka.w * plaka.h)) * 100;
-                document.getElementById('optimizasyonBilgi').innerHTML = `<p class="font-semibold">${plaka.w}x${plaka.h}</p><p>Verim: <strong class="text-green-600">${efficiency.toFixed(1)}%</strong></p>`;
+                infoEl.innerHTML = `<p class="font-semibold">${plaka.ad} (${plaka.w}x${plaka.h})</p><p>Verim: <strong class="text-green-600">${efficiency.toFixed(1)}%</strong></p>`;
             };
             
-            resizeCanvas();
-            window.onresize = resizeCanvas;
+            resizeAndDraw();
+            // Global resize handler'a bu fonksiyonu ekle
+            if (!window.resizeHandlers) window.resizeHandlers = {};
+            window.resizeHandlers[canvasId] = resizeAndDraw;
         }
-        
+
+        // --- INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
              projeyiGoster();
              kabinTipiDegisti();
+             hesaplaGlobal(); // Başlangıçta boş bir hesaplama yaparak ekranı temizle
+             
+             window.onresize = () => {
+                if(window.resizeHandlers) {
+                    for (const key in window.resizeHandlers) {
+                        window.resizeHandlers[key]();
+                    }
+                }
+             };
         });
     </script>
 </body>
