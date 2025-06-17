@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ensar Mobilya - Profesyonel Proje Hesaplayıcı v5</title>
+    <title>Ensar Mobilya - Profesyonel Proje Hesaplayıcı v7</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Teko:wght@600&display=swap" rel="stylesheet">
     <style>
+        /* Custom styles for the application */
         body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
         .logo { font-family: 'Teko', sans-serif; }
         .card { background-color: white; border-radius: 0.75rem; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); }
@@ -16,69 +17,100 @@
         .input-group input, .select-group select { width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem; transition: border-color 0.2s, box-shadow 0.2s; }
         .input-group input:focus, .select-group select:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4); }
         .btn { padding: 0.6rem 1rem; border-radius: 0.5rem; font-weight: 600; transition: background-color 0.2s; cursor: pointer; text-align: center; border: none; }
+        .btn:disabled { background-color: #9ca3af; cursor: not-allowed; }
         .btn-full { width: 100%; }
-        .btn-auto { width: auto; }
         .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.875rem; }
         .btn-primary { background-color: #2563eb; color: white; }
-        .btn-primary:hover { background-color: #1d4ed8; }
+        .btn-primary:hover:not(:disabled) { background-color: #1d4ed8; }
         .btn-secondary { background-color: #6b7280; color: white; }
-        .btn-secondary:hover { background-color: #4b5563; }
-        .btn-warning { background-color: #f59e0b; color: white; }
-        .btn-warning:hover { background-color: #d97706; }
-        .btn-success { background-color: #16a34a; color: white; }
-        .btn-success:hover { background-color: #15803d; }
+        .btn-secondary:hover:not(:disabled) { background-color: #4b5563; }
         .btn-danger { background-color: #dc2626; color: white; }
-        .btn-danger:hover { background-color: #b91c1c; }
+        .btn-danger:hover:not(:disabled) { background-color: #b91c1c; }
         .btn-icon { padding: 0.5rem; line-height: 1; }
-        [type='checkbox'] { width: 1rem; height: 1rem; border-radius: 0.25rem; }
-        .table-sticky-header thead th { position: sticky; top: 0; background-color: #f9fafb; }
+        .table-sticky-header thead th { position: sticky; top: 0; z-index: 10; background-color: #f9fafb; }
+        
+        /* Modal Styles */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; }
+        .modal-overlay.visible { opacity: 1; visibility: visible; }
+        .modal-content { background-color: white; padding: 2rem; border-radius: 0.75rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); width: 90%; max-width: 500px; transform: scale(0.95); transition: transform 0.3s; }
+        .modal-overlay.visible .modal-content { transform: scale(1); }
+
+        /* Loader Styles */
+        .loader-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255, 255, 255, 0.8); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="p-4 lg:p-6">
 
+    <!-- Loading Spinner -->
+    <div id="loader" class="loader-overlay">
+        <div class="loader"></div>
+        <p id="loaderMessage" class="mt-4 text-gray-700 font-semibold">Uygulama Yükleniyor...</p>
+    </div>
+
+    <!-- Custom Modal -->
+    <div id="customModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="modalTitle" class="text-xl font-bold text-gray-800 mb-4"></h3>
+            <div id="modalBody"></div>
+            <div id="modalActions" class="flex justify-end gap-4 mt-6"></div>
+        </div>
+    </div>
+
     <header class="max-w-screen-2xl mx-auto mb-6 flex justify-between items-center">
         <div class="logo text-4xl text-gray-800">ENSAR MOBİLYA</div>
-        <div class="text-center"><h1 class="text-2xl lg:text-3xl font-bold text-gray-800">Profesyonel Dolap Hesaplayıcı v5</h1></div>
-        <div></div>
+        <div class="text-center"><h1 id="projectTitle" class="text-2xl lg:text-3xl font-bold text-gray-800">Yeni Proje</h1></div>
+        <div id="authStatus" class="text-xs text-gray-500 text-right"></div>
     </header>
 
     <main class="max-w-screen-2xl mx-auto">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
             <div class="lg:col-span-3 space-y-6">
+                 <!-- Project Management Card -->
                 <div class="card">
-                     <h2 class="text-xl font-semibold text-gray-700 border-b pb-3 mb-4">Proje Yönetimi</h2>
-                     <div class="grid grid-cols-2 gap-3">
-                        <button onclick="projeyiKaydet()" class="btn btn-sm btn-success">Projeyi Kaydet</button>
-                        <button onclick="projeyiTemizle()" class="btn btn-sm btn-danger">Projeyi Temizle</button>
-                     </div>
-                </div>
-
-                <div class="card">
-                    <h2 class="text-xl font-semibold text-gray-700 border-b pb-3 mb-4">Proje Ayarları</h2>
+                    <h2 class="text-xl font-semibold text-gray-700 border-b pb-3 mb-4">Proje Yönetimi</h2>
                     <div class="space-y-4">
                         <div class="select-group">
+                            <label for="projectsDropdown">Projelerim</label>
+                            <select id="projectsDropdown" class="bg-gray-50"></select>
+                        </div>
+                         <div class="grid grid-cols-2 gap-3">
+                            <button id="newProjectBtn" class="btn btn-sm btn-secondary">Yeni Proje</button>
+                            <button id="saveProjectBtn" class="btn btn-sm btn-primary">Projeyi Kaydet</button>
+                        </div>
+                        <button id="deleteProjectBtn" class="btn btn-sm btn-danger btn-full">Aktif Projeyi Sil</button>
+                    </div>
+                </div>
+
+                <!-- Settings Card -->
+                <div class="card">
+                     <h2 class="text-xl font-semibold text-gray-700 border-b pb-3 mb-4">Proje Ayarları</h2>
+                     <div class="space-y-4">
+                        <div class="select-group">
                             <label for="birlesimTipi">Gövde Birleşim Tipi</label>
-                            <select id="birlesimTipi" onchange="hesaplaGlobal()">
+                            <select id="birlesimTipi" class="bg-gray-50">
                                 <option value="yandan">Yandan Basma (Tablalar Arada)</option>
                                 <option value="ustten">Üstten Basma (Tablalar Üstte)</option>
                             </select>
                         </div>
                         <div class="grid grid-cols-2 gap-3">
-                            <div class="input-group"><label for="govdeKalinligi">Gövde (mm)</label><input type="number" id="govdeKalinligi" value="18" onchange="hesaplaGlobal()"></div>
-                            <div class="input-group"><label for="arkalikKalinligi">Arkalık (mm)</label><input type="number" id="arkalikKalinligi" value="3" onchange="hesaplaGlobal()"></div>
-                            <div class="input-group"><label for="testerePayi">Testere Payı (mm)</label><input type="number" id="testerePayi" value="3" step="0.1" onchange="hesaplaGlobal()"></div>
-                            <div class="input-group"><label for="kenarBandi">Kenar Bandı (mm)</label><input type="number" id="kenarBandi" value="0.4" step="0.1" onchange="hesaplaGlobal()"></div>
-                            <div class="input-group"><label for="fugaBosluk">Fuga Boşluğu (mm)</label><input type="number" id="fugaBosluk" value="2" step="0.1" onchange="hesaplaGlobal()"></div>
-                            <div id="rayBoslukDiv" class="input-group hidden"><label for="rayBosluk">Ray Boşluğu (mm)</label><input type="number" id="rayBosluk" value="26" step="1" onchange="hesaplaGlobal()"></div>
+                            <div class="input-group"><label for="govdeKalinligi">Gövde (mm)</label><input type="number" id="govdeKalinligi" value="18"></div>
+                            <div class="input-group"><label for="arkalikKalinligi">Arkalık (mm)</label><input type="number" id="arkalikKalinligi" value="3"></div>
+                            <div class="input-group"><label for="testerePayi">Testere (mm)</label><input type="number" id="testerePayi" value="3" step="0.1"></div>
+                            <div class="input-group"><label for="kenarBandi">Bant (mm)</label><input type="number" id="kenarBandi" value="0.4" step="0.1"></div>
+                            <div class="input-group"><label for="fugaBosluk">Fuga (mm)</label><input type="number" id="fugaBosluk" value="2" step="0.1"></div>
+                            <div id="rayBoslukDiv" class="input-group hidden"><label for="rayBosluk">Ray (mm)</label><input type="number" id="rayBosluk" value="26" step="1"></div>
                         </div>
-                    </div>
+                     </div>
                 </div>
 
+                <!-- Cabinet Form Card -->
                 <div class="card">
                     <h2 id="formBasligi" class="text-xl font-semibold text-gray-700 border-b pb-3 mb-4">Yeni Kabin Ekle</h2>
-                    <div class="space-y-4">
-                        <div class="select-group"><label for="kabinTipi">Kabin Tipi</label><select id="kabinTipi" onchange="kabinTipiDegisti()"><option value="standart" selected>Standart Kapaklı</option><option value="cekmeceli">Çekmeceli</option></select></div>
+                    <form class="space-y-4" id="cabinetForm" onsubmit="return false;">
+                        <div class="select-group"><label for="kabinTipi">Kabin Tipi</label><select id="kabinTipi"><option value="standart" selected>Standart Kapaklı</option><option value="cekmeceli">Çekmeceli</option></select></div>
                         <div class="input-group"><label for="kabinAdi">Kabin Adı</label><input type="text" id="kabinAdi" value="Alt Modül"></div>
                         <div class="grid grid-cols-2 gap-3">
                            <div class="input-group"><label for="genislik">Genişlik(cm)</label><input type="number" id="genislik" value="80"></div>
@@ -89,131 +121,387 @@
                            <div id="cekmeceInputDiv" class="hidden input-group"><label for="cekmeceSayisi">Çekmece Sayısı</label><input type="number" id="cekmeceSayisi" value="3"></div>
                         </div>
                         <div class="select-group"><label for="arkalikTipi">Arkalık Tipi</label><select id="arkalikTipi"><option value="kanalli" selected>Kanallı (İçe Geçme)</option><option value="icte">Komple İçten</option></select></div>
-                        <div class="checkbox-group flex items-center gap-2 pt-2"><input type="checkbox" id="kenarBantiUygula" checked><label for="kenarBantiUygula" class="mb-0">Kapak/Raflara Kenar Bandı Uygula</label></div>
+                        <div class="flex items-center gap-2 pt-2"><input type="checkbox" id="kenarBantiUygula" checked><label for="kenarBantiUygula" class="mb-0">Kapak/Raflara Kenar Bandı Uygula</label></div>
                         <div class="pt-2">
-                            <button id="formSubmitButton" onclick="kabiniEkleVeyaGuncelle()" class="btn btn-full btn-primary">Kabini Projeye Ekle</button>
-                            <button id="formCancelButton" onclick="duzenlemeyiIptalEt()" class="btn btn-full btn-secondary mt-2 hidden">İptal</button>
+                            <button id="formSubmitButton" type="button" class="btn btn-full btn-primary">Kabini Projeye Ekle</button>
+                            <button id="formCancelButton" type="button" class="btn btn-full btn-secondary mt-2 hidden">İptal</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Middle Column: Project List -->
+            <div class="lg:col-span-3">
+                <div class="card">
+                    <h2 class="text-xl font-semibold text-gray-700 border-b pb-3 mb-4">Proje Kabinleri</h2>
+                    <div id="projeListesi" class="space-y-3 max-h-[80vh] overflow-y-auto pr-2"></div>
+                </div>
+            </div>
+            
+            <!-- Right Column: Optimization Results -->
+            <div class="lg:col-span-6">
+                <div class="card space-y-6">
+                    <div class="flex flex-wrap justify-between items-center border-b pb-3 gap-2">
+                        <h2 class="text-xl font-semibold text-gray-700">Genel Kesim ve Optimizasyon</h2>
+                        <button id="calculateBtn" class="btn btn-sm btn-secondary">Hesapla ve Optimize Et</button>
+                    </div>
+                    <div id="govdeOptimizasyonAlani">
+                        <h3 class="text-lg font-semibold text-gray-600 mb-2">Gövde ve Kapak Kesim Listesi</h3>
+                        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                            <div class="overflow-auto max-h-[40vh] table-sticky-header"><table class="w-full text-left text-sm"><thead class="bg-gray-100"><tr><th class="p-2 font-semibold">Adet</th><th class="p-2 font-semibold">Parça Adı</th><th class="p-2 font-semibold">Net Ölçü (BoyxEn)</th></tr></thead><tbody id="kesimListesiBodyGovde"></tbody></table></div>
+                            <div>
+                                <div class="flex items-center justify-between mb-2"><h4 class="font-semibold text-gray-600">Optimizasyon Şemaları</h4><div id="optimizasyonBilgiGovde" class="text-sm text-right"></div></div>
+                                <div id="canvasContainerGovde" class="space-y-4"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr/>
+                    <div id="arkalikOptimizasyonAlani">
+                        <h3 class="text-lg font-semibold text-gray-600 mb-2">Arkalık Kesim Listesi</h3>
+                        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                            <div class="overflow-auto max-h-[40vh] table-sticky-header"><table class="w-full text-left text-sm"><thead class="bg-gray-100"><tr><th class="p-2 font-semibold">Adet</th><th class="p-2 font-semibold">Parça Adı</th><th class="p-2 font-semibold">Net Ölçü (BoyxEn)</th></tr></thead><tbody id="kesimListesiBodyArkalik"></tbody></table></div>
+                            <div>
+                                <div class="flex items-center justify-between mb-2"><h4 class="font-semibold text-gray-600">Optimizasyon Şemaları</h4><div id="optimizasyonBilgiArkalik" class="text-sm text-right"></div></div>
+                                <div id="canvasContainerArkalik" class="space-y-4"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <div class="lg:col-span-3"><div class="card"><h2 class="text-xl font-semibold text-gray-700 border-b pb-3 mb-4">Proje Kabinleri</h2><div id="projeListesi" class="space-y-3 max-h-[80vh] overflow-y-auto pr-2"></div></div></div>
-            
-            <div class="lg:col-span-6"><div class="card space-y-6">
-                <div class="flex flex-wrap justify-between items-center border-b pb-3 gap-2">
-                    <h2 class="text-xl font-semibold text-gray-700">Genel Kesim ve Optimizasyon</h2>
-                    <button onclick="hesaplaGlobal()" class="btn btn-auto btn-secondary">Tümünü Hesapla ve Optimize Et</button>
-                </div>
-
-                <div id="govdeOptimizasyonAlani">
-                    <h3 class="text-lg font-semibold text-gray-600 mb-2">Gövde ve Kapak Kesim Listesi</h3>
-                    <div id="plakaOneriKutusuGovde" class="hidden p-3 mb-4 bg-blue-50 border border-blue-200 rounded-lg text-center"></div>
-                    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                        <div class="overflow-auto max-h-[40vh] table-sticky-header"><table class="w-full text-left text-sm"><thead class="bg-gray-100"><tr><th class="p-2 font-semibold">Adet</th><th class="p-2 font-semibold">Parça Adı</th><th class="p-2 font-semibold">Net Ölçü (BoyxEn)</th></tr></thead><tbody id="kesimListesiBodyGovde"></tbody></table></div>
-                        <div>
-                            <div class="flex items-center justify-between mb-2"><h4 class="font-semibold text-gray-600">Optimizasyon Şemaları</h4><div id="optimizasyonBilgiGovde" class="text-sm text-right"></div></div>
-                            <div id="canvasContainerGovde" class="space-y-4"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <hr/>
-
-                <div id="arkalikOptimizasyonAlani">
-                    <h3 class="text-lg font-semibold text-gray-600 mb-2">Arkalık Kesim Listesi</h3>
-                    <div id="plakaOneriKutusuArkalik" class="hidden p-3 mb-4 bg-purple-50 border border-purple-200 rounded-lg text-center"></div>
-                    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                        <div class="overflow-auto max-h-[40vh] table-sticky-header"><table class="w-full text-left text-sm"><thead class="bg-gray-100"><tr><th class="p-2 font-semibold">Adet</th><th class="p-2 font-semibold">Parça Adı</th><th class="p-2 font-semibold">Net Ölçü (BoyxEn)</th></tr></thead><tbody id="kesimListesiBodyArkalik"></tbody></table></div>
-                        <div>
-                            <div class="flex items-center justify-between mb-2"><h4 class="font-semibold text-gray-600">Optimizasyon Şemaları</h4><div id="optimizasyonBilgiArkalik" class="text-sm text-right"></div></div>
-                            <div id="canvasContainerArkalik" class="space-y-4"></div>
-                        </div>
-                    </div>
-                </div>
-
-            </div></div>
         </div>
     </main>
-    <footer class="text-center mt-8 text-sm text-gray-500"><p>Ahmet Burak Karakuş tarafından Geliştirilmiştir.</p></footer>
+    <footer class="text-center mt-8 text-sm text-gray-500"><p>Ahmet Burak Karakuş Tarafından Geliştirildi</p></footer>
 
-    <script>
-        const GuillotineShelfPacker = {
-            pack: function(items, sheetWidth, sheetHeight, allowRotation = true) {
-                let remainingItems = items.map((item, index) => ({...item, id: index, original_w: item.w, original_h: item.h, packed: false}));
-                remainingItems.sort((a, b) => b.h - a.h || b.w - a.w);
-                
-                let packedItems = [];
-                let currentY = 0;
+    <script type="module">
+        // Firebase Imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot, updateDoc, collection, addDoc, getDocs, deleteDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-                while(remainingItems.filter(item => !item.packed).length > 0) {
-                    let shelfHeight = 0;
-                    let shelfItems = [];
-                    let currentX = 0;
-                    
-                    const firstUnpacked = remainingItems.find(i => !i.packed);
-                    if(firstUnpacked) {
-                       if(firstUnpacked.h <= sheetHeight - currentY){ shelfHeight = firstUnpacked.h; } 
-                       else if (allowRotation && firstUnpacked.w <= sheetHeight - currentY) { shelfHeight = firstUnpacked.w; } 
-                       else { break; }
-                    } else { break; }
-
-                    if(currentY + shelfHeight > sheetHeight) break;
-
-                    for (let i = 0; i < remainingItems.length; i++) {
-                        const item = remainingItems[i];
-                        if(item.packed) continue;
-
-                        if ((currentX + item.w <= sheetWidth) && (item.h <= shelfHeight)) {
-                            item.packed = true;
-                            shelfItems.push({item: item, x: currentX, y: currentY, rotated: false});
-                            currentX += item.w;
-                        } 
-                        else if (allowRotation && (currentX + item.h <= sheetWidth) && (item.w <= shelfHeight)) {
-                            item.packed = true;
-                            shelfItems.push({item: item, x: currentX, y: currentY, rotated: true});
-                            currentX += item.h;
-                        }
-                    }
-
-                    shelfItems.forEach(packed => {
-                        packed.item.fit = {x: packed.x, y: packed.y, rotated: packed.rotated};
-                        packedItems.push(packed.item);
-                    });
-                    
-                    currentY += shelfHeight;
-                    if(currentY >= sheetHeight) break;
-                }
-
-                packedItems.forEach(item => {
-                    item.w = item.fit.rotated ? item.original_h : item.original_w;
-                    item.h = item.fit.rotated ? item.original_w : item.original_h;
-                });
-                
-                const unpackedItems = remainingItems.filter(item => !item.packed).map(item => ({w: item.original_w, h: item.original_h, net_w: item.net_w, net_h: item.net_h, ad: item.ad}));
-                return { packed: packedItems, unpacked: unpackedItems };
-            }
+        // --- GLOBAL STATE ---
+        const appState = {
+            db: null,
+            auth: null,
+            userId: null,
+            isAuthReady: false,
+            projectsListenerUnsubscribe: null,
+            
+            projectsList: [], // List of {id, name}
+            activeProjectId: null, // ID of the currently loaded project
+            
+            projectData: { // Data for the active project
+                kabinler: [],
+                ayarlar: {}
+            },
+            
+            ui: {
+                editingCabinetId: null,
+                isDirty: false, // Flag to check for unsaved changes
+            },
+            
+            mevcutPlakaGovde: { ad: "Standart Büyük", w: 183, h: 366 },
+            mevcutPlakaArkalik: { ad: "Standart Arkalık", w: 210, h: 280 },
         };
-
-        let projeKabinleri = [];
-        let projeAyarlari = {};
-        let duzenlenenKabinId = null; 
-
-        let mevcutPlakaGovde = { ad: "Standart Büyük", w: 183, h: 366 };
-        let mevcutPlakaArkalik = { ad: "Standart Arkalık", w: 210, h: 280 };
-        const LOCAL_STORAGE_KEY = 'ensarMobilyaProjev5';
-
+        
+        // --- CONSTANTS ---
         const ARKALIK_KANAL_PAYI_CM = 1.8;
         const CEKMECE_KASA_ARKA_BOSLUK_CM = 6;
         const CEKMECE_KASA_DUSUM_PAYI_CM = 4;
         const RAF_DERINLIK_BOSLUK_CM = 1;
+        const APP_ID = typeof __app_id !== 'undefined' ? __app_id : 'default-ensar-mobilya-app';
+
+        // --- DOM ELEMENTS ---
+        const UIElements = {
+            loader: document.getElementById('loader'),
+            loaderMessage: document.getElementById('loaderMessage'),
+            projectTitle: document.getElementById('projectTitle'),
+            authStatus: document.getElementById('authStatus'),
+            projectsDropdown: document.getElementById('projectsDropdown'),
+            newProjectBtn: document.getElementById('newProjectBtn'),
+            saveProjectBtn: document.getElementById('saveProjectBtn'),
+            deleteProjectBtn: document.getElementById('deleteProjectBtn'),
+            calculateBtn: document.getElementById('calculateBtn'),
+            projeListesi: document.getElementById('projeListesi'),
+            settingsInputs: document.querySelectorAll('#birlesimTipi, #govdeKalinligi, #arkalikKalinligi, #testerePayi, #kenarBandi, #fugaBosluk, #rayBosluk'),
+            cabinetForm: document.getElementById('cabinetForm'),
+            formSubmitButton: document.getElementById('formSubmitButton'),
+            formCancelButton: document.getElementById('formCancelButton'),
+            formBasligi: document.getElementById('formBasligi')
+        };
         
-        const standartPlakalar = [
-            { ad: "Standart Büyük", w: 183, h: 366 },
-            { ad: "Standart Orta", w: 210, h: 280 },
-            { ad: "Yarım Plaka", w: 122, h: 244 },
-            { ad: "Geniş Plaka", w: 210, h: 366 }
-        ];
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', initializeFirebase);
+        
+        async function initializeFirebase() {
+            try {
+                const firebaseConfig = JSON.parse(__firebase_config);
+                const app = initializeApp(firebaseConfig);
+                appState.db = getFirestore(app);
+                appState.auth = getAuth(app);
+                
+                onAuthStateChanged(appState.auth, async (user) => {
+                    if (user) {
+                        appState.userId = user.uid;
+                        UIElements.authStatus.textContent = `Kullanıcı ID: ${user.uid.substring(0, 8)}...`;
+                        appState.isAuthReady = true;
+                        attachProjectsListener();
+                    }
+                });
+
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(appState.auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(appState.auth);
+                }
+            } catch (error) {
+                console.error("Firebase initialization failed:", error);
+                UIElements.loaderMessage.textContent = 'Veritabanı bağlantısı kurulamadı.';
+            }
+        }
+
+        // --- EVENT LISTENERS ---
+        function setupEventListeners() {
+            UIElements.newProjectBtn.addEventListener('click', () => confirmAction('Yeni bir projeye başlamak istediğinizden emin misiniz? Kaydedilmemiş değişiklikler kaybolacak.', createNewProject));
+            UIElements.saveProjectBtn.addEventListener('click', saveProject);
+            UIElements.deleteProjectBtn.addEventListener('click', () => {
+                if(appState.activeProjectId) {
+                     confirmAction(`'${getCurrentProjectName()}' projesini kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.`, () => deleteProject(appState.activeProjectId));
+                } else {
+                    showModal('Uyarı', 'Silinecek aktif bir proje seçilmedi.', 'info');
+                }
+            });
+
+            UIElements.projectsDropdown.addEventListener('change', (e) => {
+                const projectIdToLoad = e.target.value;
+                if (projectIdToLoad) {
+                    const loadAction = () => loadProject(projectIdToLoad);
+                    if(appState.ui.isDirty) {
+                        confirmAction('Geçerli projede kaydedilmemiş değişiklikler var. Yine de devam edilsin mi?', loadAction);
+                    } else {
+                        loadAction();
+                    }
+                }
+            });
+
+            UIElements.settingsInputs.forEach(input => input.addEventListener('change', handleSettingChange));
+            UIElements.formSubmitButton.addEventListener('click', kabiniEkleVeyaGuncelle);
+            UIElements.formCancelButton.addEventListener('click', duzenlemeyiIptalEt);
+            document.getElementById('kabinTipi').addEventListener('change', kabinTipiDegisti);
+            UIElements.calculateBtn.addEventListener('click', hesaplaGlobal);
+        }
+
+        // --- FIRESTORE & PROJECT MANAGEMENT ---
+        
+        function getProjectsCollectionRef() {
+            return collection(appState.db, "artifacts", APP_ID, "users", appState.userId, "projects");
+        }
+
+        function attachProjectsListener() {
+            UIElements.loaderMessage.textContent = 'Projeleriniz yükleniyor...';
+            const projectsQuery = query(getProjectsCollectionRef(), orderBy("createdAt", "desc"));
+
+            if (appState.projectsListenerUnsubscribe) appState.projectsListenerUnsubscribe();
+            
+            appState.projectsListenerUnsubscribe = onSnapshot(projectsQuery, (querySnapshot) => {
+                appState.projectsList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                updateProjectsDropdown();
+
+                if (!appState.activeProjectId && appState.projectsList.length > 0) {
+                    // If no project is active, load the most recent one.
+                    loadProject(appState.projectsList[0].id);
+                } else if (appState.projectsList.length === 0) {
+                    // If user has no projects, start a new one
+                    createNewProject();
+                }
+                
+                UIElements.loader.style.display = 'none';
+                setupEventListeners(); // Setup event listeners after initial data load
+            }, (error) => {
+                console.error("Error listening to projects:", error);
+                showModal('Hata', 'Projeleriniz getirilirken bir sorun oluştu.', 'error');
+                UIElements.loader.style.display = 'none';
+            });
+        }
+        
+        function createNewProject() {
+            appState.activeProjectId = null;
+            appState.projectData = {
+                kabinler: [],
+                ayarlar: getDefaultSettings()
+            };
+            appState.ui.isDirty = false;
+            updateUIFromState();
+            console.log("Yeni proje başlatıldı.");
+        }
+
+        async function loadProject(projectId) {
+            const project = appState.projectsList.find(p => p.id === projectId);
+            if (project) {
+                appState.activeProjectId = projectId;
+                appState.projectData = {
+                    kabinler: project.kabinler || [],
+                    ayarlar: project.ayarlar || getDefaultSettings()
+                };
+                appState.ui.isDirty = false;
+                updateUIFromState();
+                console.log(`'${project.name}' projesi yüklendi.`);
+            }
+        }
+
+        async function saveProject() {
+            if (appState.activeProjectId) {
+                // Update existing project
+                UIElements.loader.style.display = 'flex';
+                UIElements.loaderMessage.textContent = 'Proje güncelleniyor...';
+                try {
+                    const projectDocRef = doc(getProjectsCollectionRef(), appState.activeProjectId);
+                    await updateDoc(projectDocRef, {
+                        ...appState.projectData,
+                        updatedAt: serverTimestamp()
+                    });
+                    appState.ui.isDirty = false;
+                    UIElements.saveProjectBtn.classList.remove('animate-pulse');
+                    showModal('Başarılı', `'${getCurrentProjectName()}' projesi başarıyla güncellendi.`, 'success');
+                } catch(error) {
+                    console.error("Error updating project:", error);
+                    showModal('Hata', 'Proje güncellenirken bir hata oluştu.', 'error');
+                } finally {
+                    UIElements.loader.style.display = 'none';
+                }
+            } else {
+                // Save new project, needs a name
+                showSaveAsModal();
+            }
+        }
+
+        async function saveNewProject(projectName) {
+            if (!projectName || !projectName.trim()) {
+                showModal('Uyarı', 'Lütfen geçerli bir proje adı girin.', 'info');
+                return;
+            }
+            UIElements.loader.style.display = 'flex';
+            UIElements.loaderMessage.textContent = 'Yeni proje kaydediliyor...';
+            try {
+                const newDocRef = await addDoc(getProjectsCollectionRef(), {
+                    name: projectName.trim(),
+                    ...appState.projectData,
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp()
+                });
+                appState.activeProjectId = newDocRef.id; // Start tracking the new project
+                appState.ui.isDirty = false; // It's now saved
+                showModal('Başarılı', `'${projectName}' projesi başarıyla kaydedildi.`, 'success');
+            } catch (error) {
+                console.error("Error creating new project: ", error);
+                 showModal('Hata', 'Yeni proje oluşturulurken bir hata oluştu.', 'error');
+            } finally {
+                UIElements.loader.style.display = 'none';
+            }
+        }
+
+        async function deleteProject(projectId) {
+             UIElements.loader.style.display = 'flex';
+             UIElements.loaderMessage.textContent = 'Proje siliniyor...';
+            try {
+                const projectDocRef = doc(getProjectsCollectionRef(), projectId);
+                await deleteDoc(projectDocRef);
+                showModal('Başarılı', 'Proje başarıyla silindi.', 'success');
+                // The listener will automatically handle the UI update
+                // and load another project or create a new one.
+                appState.activeProjectId = null;
+            } catch (error) {
+                 console.error("Error deleting project: ", error);
+                 showModal('Hata', 'Proje silinirken bir hata oluştu.', 'error');
+            } finally {
+                UIElements.loader.style.display = 'none';
+            }
+        }
+        
+        function handleSettingChange() {
+            appState.projectData.ayarlar = getSettingsFromUI();
+            appState.ui.isDirty = true;
+            UIElements.saveProjectBtn.classList.add('animate-pulse');
+            hesaplaGlobal();
+        }
+
+        // --- UI & DOM MANIPULATION ---
+
+        function updateUIFromState() {
+            // Update Project Title and Dropdown
+            const currentProject = appState.projectsList.find(p => p.id === appState.activeProjectId);
+            UIElements.projectTitle.textContent = currentProject ? currentProject.name : 'Yeni Proje (Kaydedilmedi)';
+            UIElements.projectsDropdown.value = appState.activeProjectId || "";
+            UIElements.deleteProjectBtn.disabled = !appState.activeProjectId;
+            
+            if (appState.ui.isDirty) {
+                 UIElements.saveProjectBtn.classList.add('animate-pulse');
+            } else {
+                 UIElements.saveProjectBtn.classList.remove('animate-pulse');
+            }
+
+            // Update Settings
+            const settings = appState.projectData.ayarlar;
+            for (const key in settings) {
+                const el = document.getElementById(key);
+                if (el) el.value = settings[key];
+            }
+
+            // Update Cabinet List & Calculations
+            projeyiGoster();
+            hesaplaGlobal();
+            duzenlemeyiIptalEt(); // Reset form
+        }
+        
+        function updateProjectsDropdown() {
+            const dropdown = UIElements.projectsDropdown;
+            dropdown.innerHTML = '<option value="">Proje Seçin...</option>';
+            appState.projectsList.forEach(p => {
+                const option = document.createElement('option');
+                option.value = p.id;
+                option.textContent = p.name;
+                dropdown.appendChild(option);
+            });
+            dropdown.value = appState.activeProjectId;
+        }
+
+        function projeyiGoster() {
+            const listeEl = UIElements.projeListesi;
+            listeEl.innerHTML = '';
+            if (!appState.projectData.kabinler || appState.projectData.kabinler.length === 0) {
+                listeEl.innerHTML = '<p class="text-gray-500 text-center p-4">Bu projede henüz kabin yok.</p>';
+            } else {
+                appState.projectData.kabinler.forEach(k => {
+                    const div = document.createElement('div');
+                    div.className = 'p-3 border rounded-lg bg-gray-50 flex justify-between items-center';
+                    div.innerHTML = `
+                        <div>
+                            <p class="font-semibold">${k.ad} (${k.tip === 'standart' ? k.kapak + ' Kapaklı' : k.cekmece + ' Çekmeceli'})</p>
+                            <p class="text-xs text-gray-600">${k.gen}x${k.yuk}x${k.der} cm</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="window.kabiniDuzenle('${k.id}')" class="btn btn-sm btn-icon bg-yellow-400 hover:bg-yellow-500 text-white" title="Düzenle">✏️</button>
+                            <button onclick="window.confirmKabiniSil('${k.id}')" class="btn btn-sm btn-icon bg-red-500 hover:bg-red-600 text-white" title="Sil">🗑️</button>
+                        </div>`;
+                    listeEl.appendChild(div);
+                });
+            }
+        }
+
+        function getSettingsFromUI() {
+            const settings = {};
+            UIElements.settingsInputs.forEach(input => {
+                settings[input.id] = input.value;
+            });
+            return settings;
+        }
+        
+        function getDefaultSettings() {
+            const settings = {};
+             UIElements.settingsInputs.forEach(input => {
+                settings[input.id] = input.defaultValue || input.querySelector('option')?.value;
+            });
+            return settings;
+        }
 
         function kabinTipiDegisti() {
             const tip = document.getElementById('kabinTipi').value;
@@ -224,9 +512,11 @@
             document.getElementById('cekmeceInputDiv').classList.toggle('hidden', !isCekmeceli);
             document.getElementById('rayBoslukDiv').classList.toggle('hidden', !isCekmeceli);
 
-            document.getElementById('kabinAdi').value = isCekmeceli ? "Çekmeceli Modül" : "Alt Modül";
+            if (!appState.ui.editingCabinetId) {
+                 document.getElementById('kabinAdi').value = isCekmeceli ? "Çekmeceli Modül" : "Alt Modül";
+            }
         }
-        
+
         function kabiniEkleVeyaGuncelle() {
             const formData = {
                 tip: document.getElementById('kabinTipi').value, 
@@ -241,31 +531,24 @@
                 bant: document.getElementById('kenarBantiUygula').checked
             };
 
-            if (duzenlenenKabinId !== null) {
-                const index = projeKabinleri.findIndex(k => k.id === duzenlenenKabinId);
+            if (appState.ui.editingCabinetId) {
+                const index = appState.projectData.kabinler.findIndex(k => k.id === appState.ui.editingCabinetId);
                 if (index !== -1) {
-                    projeKabinleri[index] = { ...projeKabinleri[index], ...formData };
+                    appState.projectData.kabinler[index] = { ...appState.projectData.kabinler[index], ...formData };
                 }
-                duzenlemeyiIptalEt();
             } else {
-                projeKabinleri.push({ id: Date.now(), ...formData });
+                appState.projectData.kabinler.push({ id: `kabin_${Date.now()}`, ...formData });
             }
 
-            projeyiGoster();
-            hesaplaGlobal();
+            appState.ui.isDirty = true;
+            updateUIFromState();
         }
-        
-        function kabiniSil(id) {
-            projeKabinleri = projeKabinleri.filter(k => k.id !== id);
-            projeyiGoster();
-            hesaplaGlobal();
-        }
-        
-        function kabiniDuzenle(id) {
-            const kabin = projeKabinleri.find(k => k.id === id);
+
+        window.kabiniDuzenle = (id) => {
+            const kabin = appState.projectData.kabinler.find(k => k.id === id);
             if (!kabin) return;
 
-            duzenlenenKabinId = id;
+            appState.ui.editingCabinetId = id;
 
             document.getElementById('kabinTipi').value = kabin.tip;
             kabinTipiDegisti();
@@ -279,77 +562,71 @@
             document.getElementById('arkalikTipi').value = kabin.arkalikTipi;
             document.getElementById('kenarBantiUygula').checked = kabin.bant;
 
-            document.getElementById('formBasligi').textContent = "Kabini Düzenle";
-            document.getElementById('formSubmitButton').textContent = "Değişiklikleri Kaydet";
-            document.getElementById('formSubmitButton').classList.replace('btn-primary', 'btn-warning');
-            document.getElementById('formCancelButton').classList.remove('hidden');
+            UIElements.formBasligi.textContent = "Kabini Düzenle";
+            UIElements.formSubmitButton.textContent = "Değişiklikleri Kaydet";
+            UIElements.formSubmitButton.classList.replace('btn-primary', 'bg-yellow-500');
+            UIElements.formSubmitButton.classList.add('text-white');
+            UIElements.formCancelButton.classList.remove('hidden');
             
-            document.getElementById('formBasligi').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function duzenlemeyiIptalEt() {
-            duzenlenenKabinId = null;
-            document.getElementById('formBasligi').textContent = "Yeni Kabin Ekle";
-            document.getElementById('formSubmitButton').textContent = "Kabini Projeye Ekle";
-            document.getElementById('formSubmitButton').classList.replace('btn-warning', 'btn-primary');
-            document.getElementById('formCancelButton').classList.add('hidden');
-        }
-
-        function projeyiGoster() {
-            const listeEl = document.getElementById('projeListesi');
-            listeEl.innerHTML = '';
-            if (projeKabinleri.length === 0) {
-                listeEl.innerHTML = '<p class="text-gray-500 text-center p-4">Henüz proje yok.</p>';
-            } else {
-                projeKabinleri.forEach(k => {
-                    const div = document.createElement('div');
-                    div.className = 'p-3 border rounded-lg bg-gray-50 flex justify-between items-center';
-                    div.innerHTML = `
-                        <div>
-                            <p class="font-semibold">${k.ad} (${k.tip === 'standart' ? k.kapak + ' Kapaklı' : k.cekmece + ' Çekmeceli'})</p>
-                            <p class="text-xs text-gray-600">${k.gen}x${k.yuk}x${k.der} cm</p>
-                        </div>
-                        <div class="flex gap-2">
-                           <button onclick="kabiniDuzenle(${k.id})" class="btn btn-sm btn-icon btn-warning" title="Düzenle">✏️</button>
-                           <button onclick="kabiniSil(${k.id})" class="btn btn-sm btn-icon btn-danger" title="Sil">🗑️</button>
-                        </div>`;
-                    listeEl.appendChild(div);
-                });
-            }
+            UIElements.formBasligi.scrollIntoView({ behavior: 'smooth' });
         }
         
-        function getProjectSettings() {
-             return {
-                govdeKalinlik: parseFloat(document.getElementById('govdeKalinligi').value) / 10,
-                arkalikKalinlik: parseFloat(document.getElementById('arkalikKalinligi').value) / 10,
-                testerePayi: parseFloat(document.getElementById('testerePayi').value) / 10,
-                bantKalinlik: parseFloat(document.getElementById('kenarBandi').value) / 10,
-                fugaBosluk: parseFloat(document.getElementById('fugaBosluk').value) / 10,
-                rayBosluk: parseFloat(document.getElementById('rayBosluk').value) / 10,
-                birlesimTipi: document.getElementById('birlesimTipi').value
-            };
+        function duzenlemeyiIptalEt() {
+            appState.ui.editingCabinetId = null;
+            UIElements.cabinetForm.reset();
+            kabinTipiDegisti(); // restore correct hidden states
+            UIElements.formBasligi.textContent = "Yeni Kabin Ekle";
+            UIElements.formSubmitButton.textContent = "Kabini Projeye Ekle";
+            UIElements.formSubmitButton.classList.replace('bg-yellow-500', 'btn-primary');
+            UIElements.formCancelButton.classList.add('hidden');
         }
 
+        window.confirmKabiniSil = (id) => {
+            confirmAction('Bu kabini projeden silmek istediğinizden emin misiniz?', () => {
+                appState.projectData.kabinler = appState.projectData.kabinler.filter(k => k.id !== id);
+                appState.ui.isDirty = true;
+                updateUIFromState();
+            });
+        }
+        
+        function getCurrentProjectName() {
+            const project = appState.projectsList.find(p => p.id === appState.activeProjectId);
+            return project ? project.name : "Bilinmeyen Proje";
+        }
+        
+        // --- CALCULATION LOGIC ---
+        function getCalculationSettings() {
+             const settings = appState.projectData.ayarlar;
+             return {
+                govdeKalinlik: parseFloat(settings.govdeKalinligi) / 10,
+                arkalikKalinlik: parseFloat(settings.arkalikKalinligi) / 10,
+                testerePayi: parseFloat(settings.testerePayi) / 10,
+                bantKalinlik: parseFloat(settings.kenarBandi) / 10,
+                fugaBosluk: parseFloat(settings.fugaBosluk) / 10,
+                rayBosluk: parseFloat(settings.rayBosluk) / 10,
+                birlesimTipi: settings.birlesimTipi
+            };
+        }
+        
         function hesaplaGlobal(){
-            projeAyarlari = getProjectSettings();
+            if (!appState.projectData.ayarlar || Object.keys(appState.projectData.ayarlar).length === 0) return;
+            const projeAyarlari = getCalculationSettings();
             
             document.querySelector('#govdeOptimizasyonAlani h3').textContent = `Gövde ve Kapak Kesim Listesi (${projeAyarlari.govdeKalinlik*10}mm)`;
             document.querySelector('#arkalikOptimizasyonAlani h3').textContent = `Arkalık Kesim Listesi (${projeAyarlari.arkalikKalinlik*10}mm)`;
 
-            if (projeKabinleri.length === 0) {
+            if (!appState.projectData.kabinler || appState.projectData.kabinler.length === 0) {
                 gosterKesimListesi([], 'kesimListesiBodyGovde');
                 gosterKesimListesi([], 'kesimListesiBodyArkalik');
-                optimizeVeCiz('canvasContainerGovde', 'optimizasyonBilgiGovde', [], mevcutPlakaGovde, 'Gövde');
-                optimizeVeCiz('canvasContainerArkalik', 'optimizasyonBilgiArkalik', [], mevcutPlakaArkalik, 'Arkalık');
-                document.getElementById('plakaOneriKutusuGovde').classList.add('hidden');
-                document.getElementById('plakaOneriKutusuArkalik').classList.add('hidden');
+                optimizeVeCiz('canvasContainerGovde', 'optimizasyonBilgiGovde', [], appState.mevcutPlakaGovde, 'Gövde');
+                optimizeVeCiz('canvasContainerArkalik', 'optimizasyonBilgiArkalik', [], appState.mevcutPlakaArkalik, 'Arkalık');
                 return;
             }
 
             let tumGovdeParcalari = [];
             let tumArkalikParcalari = [];
 
-            projeKabinleri.forEach(kabin => {
+            appState.projectData.kabinler.forEach(kabin => {
                 const { govde, arkalik } = kabinParcalarınıHesapla(kabin, projeAyarlari);
                 tumGovdeParcalari.push(...govde);
                 tumArkalikParcalari.push(...arkalik);
@@ -360,18 +637,11 @@
             gosterKesimListesi(govdeListesi, 'kesimListesiBodyGovde');
             gosterKesimListesi(arkalikListesi, 'kesimListesiBodyArkalik');
 
-            plakaOnerisiYap(govdeListesi, 'plakaOneriKutusuGovde', 'govde');
-            plakaOnerisiYap(arkalikListesi, 'plakaOneriKutusuArkalik', 'arkalik');
+            const govdeOptimizasyonParcalari = govdeListesi.flatMap(p => Array.from({ length: p.count }, () => ({ w: p.w_kesim, h: p.h_kesim, net_w: p.w, net_h: p.h, ad: p.ad })));
+            const arkalikOptimizasyonParcalari = arkalikListesi.flatMap(p => Array.from({ length: p.count }, () => ({ w: p.w_kesim, h: p.h_kesim, net_w: p.w, net_h: p.h, ad: p.ad })));
 
-            const govdeOptimizasyonParcalari = govdeListesi.flatMap(p => 
-                Array.from({ length: p.count }, () => ({ w: p.w_kesim, h: p.h_kesim, net_w: p.w, net_h: p.h, ad: p.ad }))
-            );
-             const arkalikOptimizasyonParcalari = arkalikListesi.flatMap(p => 
-                Array.from({ length: p.count }, () => ({ w: p.w_kesim, h: p.h_kesim, net_w: p.w, net_h: p.h, ad: p.ad }))
-            );
-
-            optimizeVeCiz('canvasContainerGovde', 'optimizasyonBilgiGovde', govdeOptimizasyonParcalari, mevcutPlakaGovde, 'Gövde');
-            optimizeVeCiz('canvasContainerArkalik', 'optimizasyonBilgiArkalik', arkalikOptimizasyonParcalari, mevcutPlakaArkalik, 'Arkalık');
+            optimizeVeCiz('canvasContainerGovde', 'optimizasyonBilgiGovde', govdeOptimizasyonParcalari, appState.mevcutPlakaGovde, 'Gövde');
+            optimizeVeCiz('canvasContainerArkalik', 'optimizasyonBilgiArkalik', arkalikOptimizasyonParcalari, appState.mevcutPlakaArkalik, 'Arkalık');
         }
 
         function kabinParcalarınıHesapla(kabin, ayarlar) {
@@ -380,23 +650,24 @@
             const { govdeKalinlik, arkalikKalinlik, testerePayi, bantKalinlik, fugaBosluk, rayBosluk, birlesimTipi } = ayarlar;
 
             const icGenislik = kabin.gen - (govdeKalinlik * 2);
-            const icYukseklik = kabin.yuk - (govdeKalinlik * 2);
-
+            let icYukseklik;
             if (birlesimTipi === 'yandan') {
-                 govdeParcalari.push({ net_h: kabin.yuk, net_w: kabin.der, count: 2, ad: 'Yan Dikme'});
-                 govdeParcalari.push({ net_h: icGenislik, net_w: kabin.der, count: 2, ad: 'Alt/Üst Tabla' });
+                icYukseklik = kabin.yuk - (govdeKalinlik * 2);
+                govdeParcalari.push({ net_h: kabin.yuk, net_w: kabin.der, count: 2, ad: 'Yan Dikme'});
+                govdeParcalari.push({ net_h: icGenislik, net_w: kabin.der, count: 2, ad: 'Alt/Üst Tabla' });
             } else { 
-                 govdeParcalari.push({ net_h: icYukseklik, net_w: kabin.der, count: 2, ad: 'Yan Dikme'});
-                 govdeParcalari.push({ net_h: kabin.gen, net_w: kabin.der, count: 2, ad: 'Alt/Üst Tabla' });
+                icYukseklik = kabin.yuk;
+                govdeParcalari.push({ net_h: kabin.yuk - (govdeKalinlik * 2), net_w: kabin.der, count: 2, ad: 'Yan Dikme'});
+                govdeParcalari.push({ net_h: kabin.gen, net_w: kabin.der, count: 2, ad: 'Alt/Üst Tabla' });
             }
-           
+            
             let arkalikGen, arkalikYuk;
             if (kabin.arkalikTipi === 'kanalli') {
                 arkalikGen = icGenislik + ARKALIK_KANAL_PAYI_CM; 
-                arkalikYuk = icYukseklik + ARKALIK_KANAL_PAYI_CM;
+                arkalikYuk = (birlesimTipi === 'yandan' ? kabin.yuk - (govdeKalinlik * 2) : kabin.yuk) + ARKALIK_KANAL_PAYI_CM;
             } else { 
                 arkalikGen = icGenislik; 
-                arkalikYuk = icYukseklik;
+                arkalikYuk = birlesimTipi === 'yandan' ? kabin.yuk - (govdeKalinlik * 2) : kabin.yuk;
             }
             arkalikParcalari.push({net_h: arkalikYuk, net_w: arkalikGen, count: 1, ad: 'Arkalık'});
             
@@ -475,44 +746,64 @@
                 tbody.innerHTML += `<tr class="border-b last:border-b-0"><td class="p-2 font-bold">${p.count}</td><td class="p-2 font-medium">${p.ad}</td><td class="p-2">${p.h.toFixed(1)}x${p.w.toFixed(1)}</td></tr>`; 
             });
         }
+        
+        // --- OPTIMIZATION & DRAWING ---
+        const GuillotineShelfPacker = {
+            pack: function(items, sheetWidth, sheetHeight, allowRotation = true) {
+                let remainingItems = items.map((item, index) => ({...item, id: index, original_w: item.w, original_h: item.h, packed: false}));
+                remainingItems.sort((a, b) => b.h - a.h || b.w - a.w);
+                
+                let packedItems = [];
+                let currentY = 0;
 
-        function plakaOnerisiYap(parcaListesi, kutuId, tip) {
-            const onerikutusu = document.getElementById(kutuId);
-            const toplamParcaAlani = parcaListesi.reduce((acc, p) => acc + (p.w * p.h * p.count), 0);
-            
-            if (toplamParcaAlani === 0) {
-                onerikutusu.classList.add('hidden');
-                return;
-            }
+                while(remainingItems.filter(item => !item.packed).length > 0) {
+                    let shelfHeight = 0;
+                    let shelfItems = [];
+                    let currentX = 0;
+                    
+                    const firstUnpacked = remainingItems.find(i => !i.packed);
+                    if(firstUnpacked) {
+                       if(firstUnpacked.h <= sheetHeight - currentY){ shelfHeight = firstUnpacked.h; } 
+                       else if (allowRotation && firstUnpacked.w <= sheetHeight - currentY) { shelfHeight = firstUnpacked.w; } 
+                       else { break; }
+                    } else { break; }
 
-            let enIyiOneri = { verim: 0, plaka: null, plakaSayisi: Infinity };
-            
-            standartPlakalar.forEach(plaka => {
-                const plakaAlani = plaka.w * plaka.h;
-                const gerekenPlakaSayisi = Math.ceil(toplamParcaAlani / plakaAlani);
-                if (gerekenPlakaSayisi < enIyiOneri.plakaSayisi) {
-                    const verim = (toplamParcaAlani / (gerekenPlakaSayisi * plakaAlani)) * 100;
-                    enIyiOneri = { verim, plaka, plakaSayisi: gerekenPlakaSayisi };
-                }
-            });
-            
-            if (enIyiOneri.plaka) {
-                onerikutusu.innerHTML = `<h3 class="font-semibold text-blue-800">Hızlı Plaka Tahmini</h3>
-                                         <p class="text-sm text-blue-700 my-1">İşiniz tahminen <strong>${enIyiOneri.plaka.ad} (${enIyiOneri.plaka.w}x${enIyiOneri.plaka.h})</strong> plaka ile çıkabilir.</p>
-                                         <button id="plakaOneriUygulaBtn${tip}" class="btn btn-auto btn-success text-xs px-3 py-1">Bu Plakayı Kullan</button>`;
-                document.getElementById(`plakaOneriUygulaBtn${tip}`).onclick = () => {
-                    if (tip === 'govde') {
-                        mevcutPlakaGovde = enIyiOneri.plaka;
-                    } else {
-                        mevcutPlakaArkalik = enIyiOneri.plaka;
+                    if(currentY + shelfHeight > sheetHeight) break;
+
+                    for (let i = 0; i < remainingItems.length; i++) {
+                        const item = remainingItems[i];
+                        if(item.packed) continue;
+
+                        if ((currentX + item.w <= sheetWidth) && (item.h <= shelfHeight)) {
+                            item.packed = true;
+                            shelfItems.push({item: item, x: currentX, y: currentY, rotated: false});
+                            currentX += item.w;
+                        } 
+                        else if (allowRotation && (currentX + item.h <= sheetWidth) && (item.w <= shelfHeight)) {
+                            item.packed = true;
+                            shelfItems.push({item: item, x: currentX, y: currentY, rotated: true});
+                            currentX += item.h;
+                        }
                     }
-                    hesaplaGlobal();
-                };
-                onerikutusu.classList.remove('hidden');
-            } else { 
-                onerikutusu.classList.add('hidden');
+
+                    shelfItems.forEach(packed => {
+                        packed.item.fit = {x: packed.x, y: packed.y, rotated: packed.rotated};
+                        packedItems.push(packed.item);
+                    });
+                    
+                    currentY += shelfHeight;
+                    if(currentY >= sheetHeight) break;
+                }
+
+                packedItems.forEach(item => {
+                    item.w = item.fit.rotated ? item.original_h : item.original_w;
+                    item.h = item.fit.rotated ? item.original_w : item.original_h;
+                });
+                
+                const unpackedItems = remainingItems.filter(item => !item.packed).map(item => ({w: item.original_w, h: item.original_h, net_w: item.net_w, net_h: item.net_h, ad: item.ad}));
+                return { packed: packedItems, unpacked: unpackedItems };
             }
-        }
+        };
 
         function runFullOptimization(items, sheetWidth, sheetHeight) {
             const allSheets = [];
@@ -552,8 +843,8 @@
                 sheetTitle.className = 'text-sm font-semibold mb-2 text-center';
                 
                 const canvas = document.createElement('canvas');
-                const canvasId = `${containerId}-canvas-${index}`;
-                canvas.id = canvasId;
+                canvas.style.width = '100%';
+                canvas.style.height = 'auto';
                 
                 sheetWrapper.appendChild(sheetTitle);
                 sheetWrapper.appendChild(canvas);
@@ -561,16 +852,19 @@
 
                 const ctx = canvas.getContext('2d');
                 
-                const resizeAndDrawSheet = () => {
-                    if (!sheetWrapper.clientWidth) return;
-                    canvas.width = sheetWrapper.clientWidth;
-                    canvas.height = sheetWrapper.clientWidth / (plaka.w / plaka.h);
+                const drawSheet = () => {
+                    const baseWidth = canvas.parentElement.clientWidth;
+                    if (!baseWidth) return;
+                    
+                    const scale = baseWidth / plaka.w;
+                    canvas.width = baseWidth;
+                    canvas.height = plaka.h * scale;
+
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                    const scale = canvas.width / plaka.w;
                     ctx.strokeStyle = '#9ca3af';
                     ctx.lineWidth = 1;
-                    ctx.strokeRect(0, 0, plaka.w * scale, plaka.h * scale);
+                    ctx.strokeRect(0, 0, canvas.width, canvas.height);
 
                     let totalArea = 0;
                     packedItems.forEach(box => {
@@ -579,8 +873,8 @@
                             ctx.strokeStyle = typeName === 'Arkalık' ? '#6d28d9' : '#1d4ed8';
                             ctx.lineWidth = 1;
 
-                            const draw_w = box.fit.rotated ? box.net_h : box.net_w;
-                            const draw_h = box.fit.rotated ? box.net_w : box.net_h;
+                            const draw_w = box.w; // Use the rotated w/h
+                            const draw_h = box.h;
                             const [rectX, rectY, rectW, rectH] = [box.fit.x * scale, box.fit.y * scale, draw_w * scale, draw_h * scale];
                             
                             ctx.fillRect(rectX, rectY, rectW, rectH);
@@ -604,92 +898,83 @@
                     const efficiency = (totalArea / (plaka.w * plaka.h)) * 100;
                     sheetTitle.textContent = `${index + 1}. Plaka (Verim: ${efficiency.toFixed(1)}%)`;
                 };
-
-                resizeAndDrawSheet();
-                 if (!window.resizeHandlers) window.resizeHandlers = {};
-                 window.resizeHandlers[canvasId] = resizeAndDrawSheet;
+                
+                const observer = new ResizeObserver(() => {
+                    window.requestAnimationFrame(drawSheet);
+                });
+                observer.observe(canvas.parentElement);
+                drawSheet();
             });
         }
         
-        function projeyiKaydet() {
-            try {
-                const settings = {
-                    govdeKalinligi: document.getElementById('govdeKalinligi').value,
-                    arkalikKalinligi: document.getElementById('arkalikKalinligi').value,
-                    testerePayi: document.getElementById('testerePayi').value,
-                    kenarBandi: document.getElementById('kenarBandi').value,
-                    fugaBosluk: document.getElementById('fugaBosluk').value,
-                    rayBosluk: document.getElementById('rayBosluk').value,
-                    birlesimTipi: document.getElementById('birlesimTipi').value
-                };
-                const projectData = {
-                    kabinler: projeKabinleri,
-                    ayarlar: settings
-                };
-                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(projectData));
-                alert('Proje başarıyla kaydedildi!');
-            } catch (error) {
-                console.error("Proje kaydedilirken hata:", error);
-                alert('Proje kaydedilemedi. Tarayıcı ayarlarınızı kontrol edin.');
-            }
+        // --- MODALS & UTILITY ---
+        
+        function showModal(title, message, type = 'info') {
+            const modal = document.getElementById('customModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            const modalActions = document.getElementById('modalActions');
+
+            modalTitle.textContent = title;
+            modalBody.innerHTML = `<p class="text-gray-600">${message}</p>`;
+            modalActions.innerHTML = `<button class="btn btn-sm btn-primary" onclick="window.closeModal()">Tamam</button>`;
+            
+            modal.classList.add('visible');
         }
 
-        function projeyiYukle() {
-            try {
-                const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
-                if (savedData) {
-                    const projectData = JSON.parse(savedData);
-                    projeKabinleri = projectData.kabinler || [];
-                    
-                    if (projectData.ayarlar) {
-                        document.getElementById('govdeKalinligi').value = projectData.ayarlar.govdeKalinligi || 18;
-                        document.getElementById('arkalikKalinligi').value = projectData.ayarlar.arkalikKalinligi || 3;
-                        document.getElementById('testerePayi').value = projectData.ayarlar.testerePayi || 3;
-                        document.getElementById('kenarBandi').value = projectData.ayarlar.kenarBandi || 0.4;
-                        document.getElementById('fugaBosluk').value = projectData.ayarlar.fugaBosluk || 2;
-                        document.getElementById('rayBosluk').value = projectData.ayarlar.rayBosluk || 26;
-                        document.getElementById('birlesimTipi').value = projectData.ayarlar.birlesimTipi || 'yandan';
-                    }
-                    
-                    projeyiGoster();
-                    hesaplaGlobal();
-                }
-            } catch (error) {
-                console.error("Proje yüklenirken hata:", error);
-                localStorage.removeItem(LOCAL_STORAGE_KEY);
-            }
+        function confirmAction(message, callback) {
+            const modal = document.getElementById('customModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            const modalActions = document.getElementById('modalActions');
+            
+            modalTitle.textContent = 'Onay Gerekli';
+            modalBody.innerHTML = `<p class="text-gray-600">${message}</p>`;
+
+            modalActions.innerHTML = `
+                <button id="confirmCancel" class="btn btn-sm btn-secondary">İptal</button>
+                <button id="confirmOk" class="btn btn-sm btn-danger">Onayla</button>
+            `;
+            
+            document.getElementById('confirmOk').onclick = () => {
+                callback();
+                closeModal();
+            };
+            document.getElementById('confirmCancel').onclick = closeModal;
+
+            modal.classList.add('visible');
         }
 
-        function projeyiTemizle() {
-            if (confirm("Mevcut projeyi ve tüm kayıtlı verileri silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.")) {
-                projeKabinleri = [];
-                localStorage.removeItem(LOCAL_STORAGE_KEY);
-                projeyiGoster();
-                hesaplaGlobal();
-                alert("Proje temizlendi.");
-            }
+        function showSaveAsModal() {
+            const modal = document.getElementById('customModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            const modalActions = document.getElementById('modalActions');
+            
+            modalTitle.textContent = 'Projeyi Farklı Kaydet';
+            modalBody.innerHTML = `
+                <label for="projectNameInput" class="input-group-label text-left">Proje Adı:</label>
+                <input type="text" id="projectNameInput" class="input-group input w-full mt-2" placeholder="Örn: Mutfak Dolabı Projesi">
+            `;
+            modalActions.innerHTML = `
+                <button class="btn btn-sm btn-secondary" onclick="window.closeModal()">İptal</button>
+                <button id="saveNewProjectBtn" class="btn btn-sm btn-primary">Kaydet</button>
+            `;
+
+            document.getElementById('saveNewProjectBtn').onclick = () => {
+                const name = document.getElementById('projectNameInput').value;
+                saveNewProject(name);
+                closeModal();
+            };
+            
+            modal.classList.add('visible');
+             setTimeout(() => document.getElementById('projectNameInput').focus(), 100);
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-             projeyiYukle();
-             if (projeKabinleri.length === 0) {
-                projeyiGoster();
-                hesaplaGlobal();
-             }
-             kabinTipiDegisti(); // Ensure correct initial UI state
-             
-             let resizeTimeout;
-             window.onresize = () => {
-                clearTimeout(resizeTimeout);
-                resizeTimeout = setTimeout(() => {
-                    if(window.resizeHandlers) {
-                        for (const key in window.resizeHandlers) {
-                            window.resizeHandlers[key]();
-                        }
-                    }
-                }, 150);
-             };
-        });
+        window.closeModal = () => {
+            document.getElementById('customModal').classList.remove('visible');
+        }
+
     </script>
 </body>
 </html>
