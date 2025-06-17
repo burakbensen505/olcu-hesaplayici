@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ensar Mobilya - Profesyonel Proje Hesaplayıcı v7</title>
+    <title>Ensar Mobilya - Proje Hesaplayıcı v12 (Yerel Versiyon)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Teko:wght@600&display=swap" rel="stylesheet">
     <style>
-        /* Custom styles for the application */
         body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
         .logo { font-family: 'Teko', sans-serif; }
         .card { background-color: white; border-radius: 0.75rem; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); }
@@ -29,25 +28,13 @@
         .btn-icon { padding: 0.5rem; line-height: 1; }
         .table-sticky-header thead th { position: sticky; top: 0; z-index: 10; background-color: #f9fafb; }
         
-        /* Modal Styles */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; }
         .modal-overlay.visible { opacity: 1; visibility: visible; }
         .modal-content { background-color: white; padding: 2rem; border-radius: 0.75rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); width: 90%; max-width: 500px; transform: scale(0.95); transition: transform 0.3s; }
         .modal-overlay.visible .modal-content { transform: scale(1); }
-
-        /* Loader Styles */
-        .loader-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255, 255, 255, 0.8); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; }
-        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="p-4 lg:p-6">
-
-    <!-- Loading Spinner -->
-    <div id="loader" class="loader-overlay">
-        <div class="loader"></div>
-        <p id="loaderMessage" class="mt-4 text-gray-700 font-semibold">Uygulama Yükleniyor...</p>
-    </div>
 
     <!-- Custom Modal -->
     <div id="customModal" class="modal-overlay">
@@ -60,30 +47,16 @@
 
     <header class="max-w-screen-2xl mx-auto mb-6 flex justify-between items-center">
         <div class="logo text-4xl text-gray-800">ENSAR MOBİLYA</div>
-        <div class="text-center"><h1 id="projectTitle" class="text-2xl lg:text-3xl font-bold text-gray-800">Yeni Proje</h1></div>
-        <div id="authStatus" class="text-xs text-gray-500 text-right"></div>
+        <div class="text-center"><h1 id="projectTitle" class="text-2xl lg:text-3xl font-bold text-gray-800">Proje Hesaplayıcı</h1></div>
+        <div class="w-40 text-right">
+             <button id="newProjectBtn" class="btn btn-sm btn-secondary">Yeni Proje</button>
+        </div>
     </header>
 
     <main class="max-w-screen-2xl mx-auto">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
             <div class="lg:col-span-3 space-y-6">
-                 <!-- Project Management Card -->
-                <div class="card">
-                    <h2 class="text-xl font-semibold text-gray-700 border-b pb-3 mb-4">Proje Yönetimi</h2>
-                    <div class="space-y-4">
-                        <div class="select-group">
-                            <label for="projectsDropdown">Projelerim</label>
-                            <select id="projectsDropdown" class="bg-gray-50"></select>
-                        </div>
-                         <div class="grid grid-cols-2 gap-3">
-                            <button id="newProjectBtn" class="btn btn-sm btn-secondary">Yeni Proje</button>
-                            <button id="saveProjectBtn" class="btn btn-sm btn-primary">Projeyi Kaydet</button>
-                        </div>
-                        <button id="deleteProjectBtn" class="btn btn-sm btn-danger btn-full">Aktif Projeyi Sil</button>
-                    </div>
-                </div>
-
                 <!-- Settings Card -->
                 <div class="card">
                      <h2 class="text-xl font-semibold text-gray-700 border-b pb-3 mb-4">Proje Ayarları</h2>
@@ -170,35 +143,13 @@
             </div>
         </div>
     </main>
-    <footer class="text-center mt-8 text-sm text-gray-500"><p>Ahmet Burak Karakuş Tarafından Geliştirildi</p></footer>
+    <footer class="text-center mt-8 text-sm text-gray-500"><p>Ahmet Burak Karakuş Tarafından Geliştirildi (Yerel Versiyon)</p></footer>
 
     <script type="module">
-        // Firebase Imports
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, updateDoc, collection, addDoc, getDocs, deleteDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
         // --- GLOBAL STATE ---
         const appState = {
-            db: null,
-            auth: null,
-            userId: null,
-            isAuthReady: false,
-            projectsListenerUnsubscribe: null,
-            
-            projectsList: [], // List of {id, name}
-            activeProjectId: null, // ID of the currently loaded project
-            
-            projectData: { // Data for the active project
-                kabinler: [],
-                ayarlar: {}
-            },
-            
-            ui: {
-                editingCabinetId: null,
-                isDirty: false, // Flag to check for unsaved changes
-            },
-            
+            projectData: { kabinler: [], ayarlar: {} },
+            ui: { editingCabinetId: null },
             mevcutPlakaGovde: { ad: "Standart Büyük", w: 183, h: 366 },
             mevcutPlakaArkalik: { ad: "Standart Arkalık", w: 210, h: 280 },
         };
@@ -208,18 +159,11 @@
         const CEKMECE_KASA_ARKA_BOSLUK_CM = 6;
         const CEKMECE_KASA_DUSUM_PAYI_CM = 4;
         const RAF_DERINLIK_BOSLUK_CM = 1;
-        const APP_ID = typeof __app_id !== 'undefined' ? __app_id : 'default-ensar-mobilya-app';
 
         // --- DOM ELEMENTS ---
         const UIElements = {
-            loader: document.getElementById('loader'),
-            loaderMessage: document.getElementById('loaderMessage'),
             projectTitle: document.getElementById('projectTitle'),
-            authStatus: document.getElementById('authStatus'),
-            projectsDropdown: document.getElementById('projectsDropdown'),
             newProjectBtn: document.getElementById('newProjectBtn'),
-            saveProjectBtn: document.getElementById('saveProjectBtn'),
-            deleteProjectBtn: document.getElementById('deleteProjectBtn'),
             calculateBtn: document.getElementById('calculateBtn'),
             projeListesi: document.getElementById('projeListesi'),
             settingsInputs: document.querySelectorAll('#birlesimTipi, #govdeKalinligi, #arkalikKalinligi, #testerePayi, #kenarBandi, #fugaBosluk, #rayBosluk'),
@@ -230,238 +174,46 @@
         };
         
         // --- INITIALIZATION ---
-        document.addEventListener('DOMContentLoaded', initializeFirebase);
+        document.addEventListener('DOMContentLoaded', main);
         
-        async function initializeFirebase() {
-            try {
-                const firebaseConfig = JSON.parse(__firebase_config);
-                const app = initializeApp(firebaseConfig);
-                appState.db = getFirestore(app);
-                appState.auth = getAuth(app);
-                
-                onAuthStateChanged(appState.auth, async (user) => {
-                    if (user) {
-                        appState.userId = user.uid;
-                        UIElements.authStatus.textContent = `Kullanıcı ID: ${user.uid.substring(0, 8)}...`;
-                        appState.isAuthReady = true;
-                        attachProjectsListener();
-                    }
-                });
-
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(appState.auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(appState.auth);
-                }
-            } catch (error) {
-                console.error("Firebase initialization failed:", error);
-                UIElements.loaderMessage.textContent = 'Veritabanı bağlantısı kurulamadı.';
-            }
+        function main() {
+            setupEventListeners();
+            createNewProject(); 
         }
-
+        
         // --- EVENT LISTENERS ---
         function setupEventListeners() {
-            UIElements.newProjectBtn.addEventListener('click', () => confirmAction('Yeni bir projeye başlamak istediğinizden emin misiniz? Kaydedilmemiş değişiklikler kaybolacak.', createNewProject));
-            UIElements.saveProjectBtn.addEventListener('click', saveProject);
-            UIElements.deleteProjectBtn.addEventListener('click', () => {
-                if(appState.activeProjectId) {
-                     confirmAction(`'${getCurrentProjectName()}' projesini kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.`, () => deleteProject(appState.activeProjectId));
-                } else {
-                    showModal('Uyarı', 'Silinecek aktif bir proje seçilmedi.', 'info');
-                }
+            UIElements.newProjectBtn.addEventListener('click', () => {
+                confirmAction('Yeni bir projeye başlamak istediğinizden emin misiniz? Mevcut projedeki tüm veriler silinecek.', createNewProject);
             });
 
-            UIElements.projectsDropdown.addEventListener('change', (e) => {
-                const projectIdToLoad = e.target.value;
-                if (projectIdToLoad) {
-                    const loadAction = () => loadProject(projectIdToLoad);
-                    if(appState.ui.isDirty) {
-                        confirmAction('Geçerli projede kaydedilmemiş değişiklikler var. Yine de devam edilsin mi?', loadAction);
-                    } else {
-                        loadAction();
-                    }
-                }
-            });
-
-            UIElements.settingsInputs.forEach(input => input.addEventListener('change', handleSettingChange));
+            UIElements.settingsInputs.forEach(input => input.addEventListener('change', hesaplaGlobal));
             UIElements.formSubmitButton.addEventListener('click', kabiniEkleVeyaGuncelle);
             UIElements.formCancelButton.addEventListener('click', duzenlemeyiIptalEt);
             document.getElementById('kabinTipi').addEventListener('change', kabinTipiDegisti);
             UIElements.calculateBtn.addEventListener('click', hesaplaGlobal);
         }
-
-        // --- FIRESTORE & PROJECT MANAGEMENT ---
         
-        function getProjectsCollectionRef() {
-            return collection(appState.db, "artifacts", APP_ID, "users", appState.userId, "projects");
-        }
-
-        function attachProjectsListener() {
-            UIElements.loaderMessage.textContent = 'Projeleriniz yükleniyor...';
-            const projectsQuery = query(getProjectsCollectionRef(), orderBy("createdAt", "desc"));
-
-            if (appState.projectsListenerUnsubscribe) appState.projectsListenerUnsubscribe();
-            
-            appState.projectsListenerUnsubscribe = onSnapshot(projectsQuery, (querySnapshot) => {
-                appState.projectsList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                updateProjectsDropdown();
-
-                if (!appState.activeProjectId && appState.projectsList.length > 0) {
-                    // If no project is active, load the most recent one.
-                    loadProject(appState.projectsList[0].id);
-                } else if (appState.projectsList.length === 0) {
-                    // If user has no projects, start a new one
-                    createNewProject();
-                }
-                
-                UIElements.loader.style.display = 'none';
-                setupEventListeners(); // Setup event listeners after initial data load
-            }, (error) => {
-                console.error("Error listening to projects:", error);
-                showModal('Hata', 'Projeleriniz getirilirken bir sorun oluştu.', 'error');
-                UIElements.loader.style.display = 'none';
-            });
-        }
-        
+        // --- PROJECT MANAGEMENT (LOCAL) ---
         function createNewProject() {
-            appState.activeProjectId = null;
             appState.projectData = {
                 kabinler: [],
                 ayarlar: getDefaultSettings()
             };
-            appState.ui.isDirty = false;
             updateUIFromState();
             console.log("Yeni proje başlatıldı.");
         }
 
-        async function loadProject(projectId) {
-            const project = appState.projectsList.find(p => p.id === projectId);
-            if (project) {
-                appState.activeProjectId = projectId;
-                appState.projectData = {
-                    kabinler: project.kabinler || [],
-                    ayarlar: project.ayarlar || getDefaultSettings()
-                };
-                appState.ui.isDirty = false;
-                updateUIFromState();
-                console.log(`'${project.name}' projesi yüklendi.`);
-            }
-        }
-
-        async function saveProject() {
-            if (appState.activeProjectId) {
-                // Update existing project
-                UIElements.loader.style.display = 'flex';
-                UIElements.loaderMessage.textContent = 'Proje güncelleniyor...';
-                try {
-                    const projectDocRef = doc(getProjectsCollectionRef(), appState.activeProjectId);
-                    await updateDoc(projectDocRef, {
-                        ...appState.projectData,
-                        updatedAt: serverTimestamp()
-                    });
-                    appState.ui.isDirty = false;
-                    UIElements.saveProjectBtn.classList.remove('animate-pulse');
-                    showModal('Başarılı', `'${getCurrentProjectName()}' projesi başarıyla güncellendi.`, 'success');
-                } catch(error) {
-                    console.error("Error updating project:", error);
-                    showModal('Hata', 'Proje güncellenirken bir hata oluştu.', 'error');
-                } finally {
-                    UIElements.loader.style.display = 'none';
-                }
-            } else {
-                // Save new project, needs a name
-                showSaveAsModal();
-            }
-        }
-
-        async function saveNewProject(projectName) {
-            if (!projectName || !projectName.trim()) {
-                showModal('Uyarı', 'Lütfen geçerli bir proje adı girin.', 'info');
-                return;
-            }
-            UIElements.loader.style.display = 'flex';
-            UIElements.loaderMessage.textContent = 'Yeni proje kaydediliyor...';
-            try {
-                const newDocRef = await addDoc(getProjectsCollectionRef(), {
-                    name: projectName.trim(),
-                    ...appState.projectData,
-                    createdAt: serverTimestamp(),
-                    updatedAt: serverTimestamp()
-                });
-                appState.activeProjectId = newDocRef.id; // Start tracking the new project
-                appState.ui.isDirty = false; // It's now saved
-                showModal('Başarılı', `'${projectName}' projesi başarıyla kaydedildi.`, 'success');
-            } catch (error) {
-                console.error("Error creating new project: ", error);
-                 showModal('Hata', 'Yeni proje oluşturulurken bir hata oluştu.', 'error');
-            } finally {
-                UIElements.loader.style.display = 'none';
-            }
-        }
-
-        async function deleteProject(projectId) {
-             UIElements.loader.style.display = 'flex';
-             UIElements.loaderMessage.textContent = 'Proje siliniyor...';
-            try {
-                const projectDocRef = doc(getProjectsCollectionRef(), projectId);
-                await deleteDoc(projectDocRef);
-                showModal('Başarılı', 'Proje başarıyla silindi.', 'success');
-                // The listener will automatically handle the UI update
-                // and load another project or create a new one.
-                appState.activeProjectId = null;
-            } catch (error) {
-                 console.error("Error deleting project: ", error);
-                 showModal('Hata', 'Proje silinirken bir hata oluştu.', 'error');
-            } finally {
-                UIElements.loader.style.display = 'none';
-            }
-        }
-        
-        function handleSettingChange() {
-            appState.projectData.ayarlar = getSettingsFromUI();
-            appState.ui.isDirty = true;
-            UIElements.saveProjectBtn.classList.add('animate-pulse');
-            hesaplaGlobal();
-        }
-
         // --- UI & DOM MANIPULATION ---
-
         function updateUIFromState() {
-            // Update Project Title and Dropdown
-            const currentProject = appState.projectsList.find(p => p.id === appState.activeProjectId);
-            UIElements.projectTitle.textContent = currentProject ? currentProject.name : 'Yeni Proje (Kaydedilmedi)';
-            UIElements.projectsDropdown.value = appState.activeProjectId || "";
-            UIElements.deleteProjectBtn.disabled = !appState.activeProjectId;
-            
-            if (appState.ui.isDirty) {
-                 UIElements.saveProjectBtn.classList.add('animate-pulse');
-            } else {
-                 UIElements.saveProjectBtn.classList.remove('animate-pulse');
-            }
-
-            // Update Settings
             const settings = appState.projectData.ayarlar;
             for (const key in settings) {
                 const el = document.getElementById(key);
                 if (el) el.value = settings[key];
             }
-
-            // Update Cabinet List & Calculations
             projeyiGoster();
             hesaplaGlobal();
-            duzenlemeyiIptalEt(); // Reset form
-        }
-        
-        function updateProjectsDropdown() {
-            const dropdown = UIElements.projectsDropdown;
-            dropdown.innerHTML = '<option value="">Proje Seçin...</option>';
-            appState.projectsList.forEach(p => {
-                const option = document.createElement('option');
-                option.value = p.id;
-                option.textContent = p.name;
-                dropdown.appendChild(option);
-            });
-            dropdown.value = appState.activeProjectId;
+            duzenlemeyiIptalEt();
         }
 
         function projeyiGoster() {
@@ -490,15 +242,16 @@
         function getSettingsFromUI() {
             const settings = {};
             UIElements.settingsInputs.forEach(input => {
-                settings[input.id] = input.value;
+                settings[input.id] = isNaN(parseFloat(input.value)) ? input.value : parseFloat(input.value);
             });
             return settings;
         }
         
         function getDefaultSettings() {
-            const settings = {};
+             const settings = {};
              UIElements.settingsInputs.forEach(input => {
-                settings[input.id] = input.defaultValue || input.querySelector('option')?.value;
+                 const value = input.defaultValue || (input.options ? input.options[0].value : '');
+                 settings[input.id] = isNaN(parseFloat(value)) ? value : parseFloat(value);
             });
             return settings;
         }
@@ -539,8 +292,6 @@
             } else {
                 appState.projectData.kabinler.push({ id: `kabin_${Date.now()}`, ...formData });
             }
-
-            appState.ui.isDirty = true;
             updateUIFromState();
         }
 
@@ -574,7 +325,7 @@
         function duzenlemeyiIptalEt() {
             appState.ui.editingCabinetId = null;
             UIElements.cabinetForm.reset();
-            kabinTipiDegisti(); // restore correct hidden states
+            kabinTipiDegisti(); 
             UIElements.formBasligi.textContent = "Yeni Kabin Ekle";
             UIElements.formSubmitButton.textContent = "Kabini Projeye Ekle";
             UIElements.formSubmitButton.classList.replace('bg-yellow-500', 'btn-primary');
@@ -584,14 +335,8 @@
         window.confirmKabiniSil = (id) => {
             confirmAction('Bu kabini projeden silmek istediğinizden emin misiniz?', () => {
                 appState.projectData.kabinler = appState.projectData.kabinler.filter(k => k.id !== id);
-                appState.ui.isDirty = true;
                 updateUIFromState();
             });
-        }
-        
-        function getCurrentProjectName() {
-            const project = appState.projectsList.find(p => p.id === appState.activeProjectId);
-            return project ? project.name : "Bilinmeyen Proje";
         }
         
         // --- CALCULATION LOGIC ---
@@ -609,7 +354,9 @@
         }
         
         function hesaplaGlobal(){
-            if (!appState.projectData.ayarlar || Object.keys(appState.projectData.ayarlar).length === 0) return;
+            if (!appState.projectData.ayarlar || Object.keys(appState.projectData.ayarlar).length === 0) {
+                appState.projectData.ayarlar = getDefaultSettings();
+            };
             const projeAyarlari = getCalculationSettings();
             
             document.querySelector('#govdeOptimizasyonAlani h3').textContent = `Gövde ve Kapak Kesim Listesi (${projeAyarlari.govdeKalinlik*10}mm)`;
@@ -650,13 +397,10 @@
             const { govdeKalinlik, arkalikKalinlik, testerePayi, bantKalinlik, fugaBosluk, rayBosluk, birlesimTipi } = ayarlar;
 
             const icGenislik = kabin.gen - (govdeKalinlik * 2);
-            let icYukseklik;
             if (birlesimTipi === 'yandan') {
-                icYukseklik = kabin.yuk - (govdeKalinlik * 2);
                 govdeParcalari.push({ net_h: kabin.yuk, net_w: kabin.der, count: 2, ad: 'Yan Dikme'});
                 govdeParcalari.push({ net_h: icGenislik, net_w: kabin.der, count: 2, ad: 'Alt/Üst Tabla' });
             } else { 
-                icYukseklik = kabin.yuk;
                 govdeParcalari.push({ net_h: kabin.yuk - (govdeKalinlik * 2), net_w: kabin.der, count: 2, ad: 'Yan Dikme'});
                 govdeParcalari.push({ net_h: kabin.gen, net_w: kabin.der, count: 2, ad: 'Alt/Üst Tabla' });
             }
@@ -696,9 +440,7 @@
                 if (kabin.raf > 0) {
                     let rafGen = icGenislik;
                     let rafDer = kabin.der - RAF_DERINLIK_BOSLUK_CM;
-                    if (kabin.bant) {
-                        rafDer -= bantKalinlik;
-                    }
+                    if (kabin.bant) rafDer -= bantKalinlik;
                     govdeParcalari.push({ net_h: rafGen, net_w: rafDer, count: kabin.raf, ad: 'Raf' });
                 }
                 if (kabin.kapak > 0) {
@@ -718,11 +460,7 @@
             }
             
             const addKerf = (p) => ({ ...p, h: p.net_h, w: p.net_w, h_kesim: p.net_h + testerePayi, w_kesim: p.net_w + testerePayi });
-            
-            return {
-                govde: govdeParcalari.map(addKerf),
-                arkalik: arkalikParcalari.map(addKerf)
-            };
+            return { govde: govdeParcalari.map(addKerf), arkalik: arkalikParcalari.map(addKerf) };
         }
 
         function birlestirVeGrupla(parcalar) {
@@ -757,32 +495,31 @@
                 let currentY = 0;
 
                 while(remainingItems.filter(item => !item.packed).length > 0) {
-                    let shelfHeight = 0;
-                    let shelfItems = [];
-                    let currentX = 0;
-                    
+                    let shelfHeight = 0, currentX = 0;
                     const firstUnpacked = remainingItems.find(i => !i.packed);
-                    if(firstUnpacked) {
-                       if(firstUnpacked.h <= sheetHeight - currentY){ shelfHeight = firstUnpacked.h; } 
-                       else if (allowRotation && firstUnpacked.w <= sheetHeight - currentY) { shelfHeight = firstUnpacked.w; } 
-                       else { break; }
-                    } else { break; }
-
+                    if(!firstUnpacked) break;
+                    
+                    if(firstUnpacked.h <= sheetHeight - currentY) shelfHeight = firstUnpacked.h;
+                    else if (allowRotation && firstUnpacked.w <= sheetHeight - currentY) shelfHeight = firstUnpacked.w; 
+                    else break; 
                     if(currentY + shelfHeight > sheetHeight) break;
-
+                    
+                    let shelfItems = [];
                     for (let i = 0; i < remainingItems.length; i++) {
                         const item = remainingItems[i];
                         if(item.packed) continue;
 
+                        let fit = false, rotated = false;
                         if ((currentX + item.w <= sheetWidth) && (item.h <= shelfHeight)) {
+                           fit = true; rotated = false;
+                        } else if (allowRotation && (currentX + item.h <= sheetWidth) && (item.w <= shelfHeight)) {
+                           fit = true; rotated = true;
+                        }
+                        
+                        if(fit){
                             item.packed = true;
-                            shelfItems.push({item: item, x: currentX, y: currentY, rotated: false});
-                            currentX += item.w;
-                        } 
-                        else if (allowRotation && (currentX + item.h <= sheetWidth) && (item.w <= shelfHeight)) {
-                            item.packed = true;
-                            shelfItems.push({item: item, x: currentX, y: currentY, rotated: true});
-                            currentX += item.h;
+                            shelfItems.push({item: item, x: currentX, y: currentY, rotated: rotated});
+                            currentX += rotated ? item.h : item.w;
                         }
                     }
 
@@ -792,7 +529,6 @@
                     });
                     
                     currentY += shelfHeight;
-                    if(currentY >= sheetHeight) break;
                 }
 
                 packedItems.forEach(item => {
@@ -808,7 +544,6 @@
         function runFullOptimization(items, sheetWidth, sheetHeight) {
             const allSheets = [];
             let itemsToPack = JSON.parse(JSON.stringify(items));
-
             while (itemsToPack.length > 0) {
                 const result = GuillotineShelfPacker.pack(itemsToPack, sheetWidth, sheetHeight);
                 if (result.packed.length === 0) {
@@ -827,148 +562,84 @@
             canvasContainer.innerHTML = '';
 
             if (boxes.length === 0) {
-                infoEl.innerHTML = '';
-                return;
+                infoEl.innerHTML = ''; return;
             }
 
             const allPackedSheets = runFullOptimization(boxes, plaka.w, plaka.h);
-            
             infoEl.innerHTML = `<p class="font-semibold">${allPackedSheets.length} Adet ${plaka.ad} (${plaka.w}x${plaka.h})</p>`;
 
             allPackedSheets.forEach((packedItems, index) => {
                 const sheetWrapper = document.createElement('div');
                 sheetWrapper.className = 'border rounded-lg p-2';
-                
                 const sheetTitle = document.createElement('h5');
                 sheetTitle.className = 'text-sm font-semibold mb-2 text-center';
-                
                 const canvas = document.createElement('canvas');
-                canvas.style.width = '100%';
-                canvas.style.height = 'auto';
-                
-                sheetWrapper.appendChild(sheetTitle);
-                sheetWrapper.appendChild(canvas);
+                canvas.style.width = '100%'; canvas.style.height = 'auto';
+                sheetWrapper.append(sheetTitle, canvas);
                 canvasContainer.appendChild(sheetWrapper);
 
-                const ctx = canvas.getContext('2d');
-                
                 const drawSheet = () => {
                     const baseWidth = canvas.parentElement.clientWidth;
                     if (!baseWidth) return;
                     
                     const scale = baseWidth / plaka.w;
-                    canvas.width = baseWidth;
-                    canvas.height = plaka.h * scale;
-
+                    canvas.width = baseWidth; canvas.height = plaka.h * scale;
+                    const ctx = canvas.getContext('2d');
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-                    ctx.strokeStyle = '#9ca3af';
-                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = '#9ca3af'; ctx.lineWidth = 1;
                     ctx.strokeRect(0, 0, canvas.width, canvas.height);
 
                     let totalArea = 0;
                     packedItems.forEach(box => {
-                        if (box.fit) {
-                            ctx.fillStyle = typeName === 'Arkalık' ? 'rgba(128, 90, 213, 0.7)' : 'rgba(59, 130, 246, 0.7)';
-                            ctx.strokeStyle = typeName === 'Arkalık' ? '#6d28d9' : '#1d4ed8';
-                            ctx.lineWidth = 1;
-
-                            const draw_w = box.w; // Use the rotated w/h
-                            const draw_h = box.h;
-                            const [rectX, rectY, rectW, rectH] = [box.fit.x * scale, box.fit.y * scale, draw_w * scale, draw_h * scale];
-                            
-                            ctx.fillRect(rectX, rectY, rectW, rectH);
-                            ctx.strokeRect(rectX, rectY, rectW, rectH);
-                            
-                            if (rectW > 40 && rectH > 15) {
-                                ctx.fillStyle = '#ffffff';
-                                ctx.textAlign = 'center';
-                                ctx.textBaseline = 'middle';
-                                const fontSize = Math.min(rectH / 5, 10);
-                                ctx.font = `bold ${fontSize}px Inter`;
-                                const textX = rectX + rectW / 2;
-                                const textY = rectY + rectH / 2;
-                                ctx.fillText(box.ad, textX, textY - (fontSize / 2));
-                                ctx.fillText(`${box.net_w.toFixed(1)}x${box.net_h.toFixed(1)}`, textX, textY + (fontSize / 2) + 2);
-                            }
-                            totalArea += box.net_w * box.net_h;
+                        if (!box.fit) return;
+                        ctx.fillStyle = typeName === 'Arkalık' ? 'rgba(128, 90, 213, 0.7)' : 'rgba(59, 130, 246, 0.7)';
+                        ctx.strokeStyle = typeName === 'Arkalık' ? '#6d28d9' : '#1d4ed8';
+                        ctx.lineWidth = 1;
+                        const [rectX, rectY, rectW, rectH] = [box.fit.x * scale, box.fit.y * scale, box.w * scale, box.h * scale];
+                        ctx.fillRect(rectX, rectY, rectW, rectH);
+                        ctx.strokeRect(rectX, rectY, rectW, rectH);
+                        
+                        if (rectW > 40 && rectH > 15) {
+                            ctx.fillStyle = '#ffffff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                            const fontSize = Math.min(rectH / 5, 10);
+                            ctx.font = `bold ${fontSize}px Inter`;
+                            const textX = rectX + rectW / 2;
+                            const textY = rectY + rectH / 2;
+                            ctx.fillText(box.ad, textX, textY - (fontSize / 2));
+                            ctx.fillText(`${box.net_w.toFixed(1)}x${box.net_h.toFixed(1)}`, textX, textY + (fontSize / 2) + 2);
                         }
+                        totalArea += box.net_w * box.net_h;
                     });
-
                     const efficiency = (totalArea / (plaka.w * plaka.h)) * 100;
                     sheetTitle.textContent = `${index + 1}. Plaka (Verim: ${efficiency.toFixed(1)}%)`;
                 };
                 
-                const observer = new ResizeObserver(() => {
-                    window.requestAnimationFrame(drawSheet);
-                });
+                const observer = new ResizeObserver(drawSheet);
                 observer.observe(canvas.parentElement);
                 drawSheet();
             });
         }
         
         // --- MODALS & UTILITY ---
-        
-        function showModal(title, message, type = 'info') {
+        function showModal(title, message) {
             const modal = document.getElementById('customModal');
-            const modalTitle = document.getElementById('modalTitle');
-            const modalBody = document.getElementById('modalBody');
-            const modalActions = document.getElementById('modalActions');
-
-            modalTitle.textContent = title;
-            modalBody.innerHTML = `<p class="text-gray-600">${message}</p>`;
-            modalActions.innerHTML = `<button class="btn btn-sm btn-primary" onclick="window.closeModal()">Tamam</button>`;
-            
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalBody').innerHTML = `<p class="text-gray-600">${message}</p>`;
+            document.getElementById('modalActions').innerHTML = `<button class="btn btn-sm btn-primary" onclick="window.closeModal()">Tamam</button>`;
             modal.classList.add('visible');
         }
 
         function confirmAction(message, callback) {
             const modal = document.getElementById('customModal');
-            const modalTitle = document.getElementById('modalTitle');
-            const modalBody = document.getElementById('modalBody');
-            const modalActions = document.getElementById('modalActions');
-            
-            modalTitle.textContent = 'Onay Gerekli';
-            modalBody.innerHTML = `<p class="text-gray-600">${message}</p>`;
-
-            modalActions.innerHTML = `
+            document.getElementById('modalTitle').textContent = 'Onay Gerekli';
+            document.getElementById('modalBody').innerHTML = `<p class="text-gray-600">${message}</p>`;
+            document.getElementById('modalActions').innerHTML = `
                 <button id="confirmCancel" class="btn btn-sm btn-secondary">İptal</button>
                 <button id="confirmOk" class="btn btn-sm btn-danger">Onayla</button>
             `;
-            
-            document.getElementById('confirmOk').onclick = () => {
-                callback();
-                closeModal();
-            };
+            document.getElementById('confirmOk').onclick = () => { callback(); closeModal(); };
             document.getElementById('confirmCancel').onclick = closeModal;
-
             modal.classList.add('visible');
-        }
-
-        function showSaveAsModal() {
-            const modal = document.getElementById('customModal');
-            const modalTitle = document.getElementById('modalTitle');
-            const modalBody = document.getElementById('modalBody');
-            const modalActions = document.getElementById('modalActions');
-            
-            modalTitle.textContent = 'Projeyi Farklı Kaydet';
-            modalBody.innerHTML = `
-                <label for="projectNameInput" class="input-group-label text-left">Proje Adı:</label>
-                <input type="text" id="projectNameInput" class="input-group input w-full mt-2" placeholder="Örn: Mutfak Dolabı Projesi">
-            `;
-            modalActions.innerHTML = `
-                <button class="btn btn-sm btn-secondary" onclick="window.closeModal()">İptal</button>
-                <button id="saveNewProjectBtn" class="btn btn-sm btn-primary">Kaydet</button>
-            `;
-
-            document.getElementById('saveNewProjectBtn').onclick = () => {
-                const name = document.getElementById('projectNameInput').value;
-                saveNewProject(name);
-                closeModal();
-            };
-            
-            modal.classList.add('visible');
-             setTimeout(() => document.getElementById('projectNameInput').focus(), 100);
         }
 
         window.closeModal = () => {
@@ -977,4 +648,4 @@
 
     </script>
 </body>
-</html>
+</ht
