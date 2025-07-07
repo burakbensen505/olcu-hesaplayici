@@ -3,649 +3,465 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ensar Mobilya - Proje Hesaplayıcı v12 (Yerel Versiyon)</title>
+    <title>Ensar Mobilya - Proje Hesaplayıcı v13 Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Teko:wght@600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Teko:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
-        .logo { font-family: 'Teko', sans-serif; }
-        .card { background-color: white; border-radius: 0.75rem; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); }
-        .input-group label, .select-group label { display: block; margin-bottom: 0.5rem; color: #4b5563; font-weight: 500; font-size: 0.875rem; }
-        .input-group input, .select-group select { width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem; transition: border-color 0.2s, box-shadow 0.2s; }
-        .input-group input:focus, .select-group select:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4); }
-        .btn { padding: 0.6rem 1rem; border-radius: 0.5rem; font-weight: 600; transition: background-color 0.2s; cursor: pointer; text-align: center; border: none; }
-        .btn:disabled { background-color: #9ca3af; cursor: not-allowed; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        .logo { 
+            font-family: 'Teko', sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .card { 
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 1rem; 
+            padding: 1.5rem; 
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+        .input-group label, .select-group label { 
+            display: block; 
+            margin-bottom: 0.5rem; 
+            color: #374151; 
+            font-weight: 600; 
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .input-group input, .select-group select { 
+            width: 100%; 
+            padding: 0.75rem; 
+            border: 2px solid #e5e7eb; 
+            border-radius: 0.75rem; 
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+        }
+        .input-group input:focus, .select-group select:focus { 
+            outline: none; 
+            border-color: #667eea; 
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+            transform: scale(1.02);
+        }
+        .btn { 
+            padding: 0.75rem 1.5rem; 
+            border-radius: 0.75rem; 
+            font-weight: 600; 
+            transition: all 0.3s ease;
+            cursor: pointer; 
+            text-align: center; 
+            border: none;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+        .btn:hover:before {
+            left: 100%;
+        }
+        .btn:disabled { 
+            background-color: #9ca3af; 
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
         .btn-full { width: 100%; }
-        .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.875rem; }
-        .btn-primary { background-color: #2563eb; color: white; }
-        .btn-primary:hover:not(:disabled) { background-color: #1d4ed8; }
-        .btn-secondary { background-color: #6b7280; color: white; }
-        .btn-secondary:hover:not(:disabled) { background-color: #4b5563; }
-        .btn-danger { background-color: #dc2626; color: white; }
-        .btn-danger:hover:not(:disabled) { background-color: #b91c1c; }
-        .btn-icon { padding: 0.5rem; line-height: 1; }
-        .table-sticky-header thead th { position: sticky; top: 0; z-index: 10; background-color: #f9fafb; }
-        
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; }
-        .modal-overlay.visible { opacity: 1; visibility: visible; }
-        .modal-content { background-color: white; padding: 2rem; border-radius: 0.75rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); width: 90%; max-width: 500px; transform: scale(0.95); transition: transform 0.3s; }
-        .modal-overlay.visible .modal-content { transform: scale(1); }
+        .btn-sm { padding: 0.5rem 1rem; font-size: 0.875rem; }
+        .btn-primary { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; 
+        }
+        .btn-secondary { 
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+            color: white; 
+        }
+        .btn-danger { 
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white; 
+        }
+        .btn-warning { 
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white; 
+        }
+        .btn-success { 
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white; 
+        }
+        .btn-icon { 
+            padding: 0.6rem; 
+            line-height: 1;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .table-sticky-header thead th { 
+            position: sticky; 
+            top: 0; 
+            z-index: 10; 
+            background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+            backdrop-filter: blur(10px);
+        }
+        .modal-overlay { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            bottom: 0; 
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 1000; 
+            opacity: 0; 
+            visibility: hidden; 
+            transition: all 0.3s ease;
+        }
+        .modal-overlay.visible { 
+            opacity: 1; 
+            visibility: visible; 
+        }
+        .modal-content { 
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            padding: 2rem; 
+            border-radius: 1rem; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            width: 90%; 
+            max-width: 500px; 
+            transform: scale(0.8) translateY(50px);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .modal-overlay.visible .modal-content { 
+            transform: scale(1) translateY(0);
+        }
+        .cabinet-item {
+            background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(248,250,252,0.9) 100%);
+            border: 2px solid rgba(102, 126, 234, 0.1);
+            border-radius: 1rem;
+            padding: 1.2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .cabinet-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+        .cabinet-item:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .optimization-canvas {
+            border: 2px solid #e5e7eb;
+            border-radius: 0.75rem;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        .optimization-canvas:hover {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        .stats-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        .stats-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        .animate-pulse-custom {
+            animation: pulse-custom 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse-custom {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .loading-spinner {
+            border: 3px solid rgba(102, 126, 234, 0.3);
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .header-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .section-title {
+            position: relative;
+            padding-bottom: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
+        }
+        .floating-action {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 100;
+        }
+        .tooltip {
+            position: relative;
+        }
+        .tooltip:hover:after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            white-space: nowrap;
+            z-index: 1000;
+        }
     </style>
 </head>
-<body class="p-4 lg:p-6">
-
+<body class="min-h-screen">
     <!-- Custom Modal -->
     <div id="customModal" class="modal-overlay">
         <div class="modal-content">
-            <h3 id="modalTitle" class="text-xl font-bold text-gray-800 mb-4"></h3>
-            <div id="modalBody"></div>
-            <div id="modalActions" class="flex justify-end gap-4 mt-6"></div>
+            <h3 id="modalTitle" class="text-2xl font-bold text-gray-800 mb-4"></h3>
+            <div id="modalBody" class="text-gray-600 mb-6"></div>
+            <div id="modalActions" class="flex justify-end gap-3"></div>
         </div>
     </div>
 
-    <header class="max-w-screen-2xl mx-auto mb-6 flex justify-between items-center">
-        <div class="logo text-4xl text-gray-800">ENSAR MOBİLYA</div>
-        <div class="text-center"><h1 id="projectTitle" class="text-2xl lg:text-3xl font-bold text-gray-800">Proje Hesaplayıcı</h1></div>
-        <div class="w-40 text-right">
-             <button id="newProjectBtn" class="btn btn-sm btn-secondary">Yeni Proje</button>
-        </div>
-    </header>
+    <!-- Floating Action Button -->
+    <div class="floating-action">
+        <button id="quickCalculateBtn" class="btn btn-primary btn-icon tooltip" data-tooltip="Hızlı Hesapla">
+            <span class="text-xl">⚡</span>
+        </button>
+    </div>
 
-    <main class="max-w-screen-2xl mx-auto">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            
+    <div class="container mx-auto px-4 py-6 max-w-7xl">
+        <!-- Header -->
+        <header class="header-container mb-8">
+            <div class="flex flex-wrap justify-between items-center gap-4">
+                <div class="logo text-5xl font-bold">ENSAR MOBİLYA</div>
+                <div class="text-center flex-1">
+                    <h1 id="projectTitle" class="text-3xl lg:text-4xl font-bold text-gray-800 mb-2">
+                        Proje Hesaplayıcı Pro
+                    </h1>
+                    <p class="text-gray-600 font-medium">Profesyonel Mobilya Optimizasyon Sistemi</p>
+                </div>
+                <div class="flex gap-3">
+                    <button id="saveProjectBtn" class="btn btn-sm btn-success tooltip" data-tooltip="Projeyi Kaydet">
+                        💾 Kaydet
+                    </button>
+                    <button id="loadProjectBtn" class="btn btn-sm btn-warning tooltip" data-tooltip="Proje Yükle">
+                        📂 Yükle
+                    </button>
+                    <button id="newProjectBtn" class="btn btn-sm btn-secondary tooltip" data-tooltip="Yeni Proje">
+                        ✨ Yeni Proje
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Settings Panel -->
             <div class="lg:col-span-3 space-y-6">
                 <!-- Settings Card -->
                 <div class="card">
-                     <h2 class="text-xl font-semibold text-gray-700 border-b pb-3 mb-4">Proje Ayarları</h2>
-                     <div class="space-y-4">
+                    <h2 class="section-title text-xl font-bold text-gray-700">Proje Ayarları</h2>
+                    <div class="space-y-4">
                         <div class="select-group">
-                            <label for="birlesimTipi">Gövde Birleşim Tipi</label>
+                            <label for="birlesimTipi">🔧 Gövde Birleşim Tipi</label>
                             <select id="birlesimTipi" class="bg-gray-50">
                                 <option value="yandan">Yandan Basma (Tablalar Arada)</option>
                                 <option value="ustten">Üstten Basma (Tablalar Üstte)</option>
                             </select>
                         </div>
                         <div class="grid grid-cols-2 gap-3">
-                            <div class="input-group"><label for="govdeKalinligi">Gövde (mm)</label><input type="number" id="govdeKalinligi" value="18"></div>
-                            <div class="input-group"><label for="arkalikKalinligi">Arkalık (mm)</label><input type="number" id="arkalikKalinligi" value="3"></div>
-                            <div class="input-group"><label for="testerePayi">Testere (mm)</label><input type="number" id="testerePayi" value="3" step="0.1"></div>
-                            <div class="input-group"><label for="kenarBandi">Bant (mm)</label><input type="number" id="kenarBandi" value="0.4" step="0.1"></div>
-                            <div class="input-group"><label for="fugaBosluk">Fuga (mm)</label><input type="number" id="fugaBosluk" value="2" step="0.1"></div>
-                            <div id="rayBoslukDiv" class="input-group hidden"><label for="rayBosluk">Ray (mm)</label><input type="number" id="rayBosluk" value="26" step="1"></div>
+                            <div class="input-group">
+                                <label for="govdeKalinligi">📏 Gövde (mm)</label>
+                                <input type="number" id="govdeKalinligi" value="18" min="1" max="50">
+                            </div>
+                            <div class="input-group">
+                                <label for="arkalikKalinligi">🔲 Arkalık (mm)</label>
+                                <input type="number" id="arkalikKalinligi" value="3" min="1" max="20">
+                            </div>
+                            <div class="input-group">
+                                <label for="testerePayi">⚔️ Testere (mm)</label>
+                                <input type="number" id="testerePayi" value="3" step="0.1" min="0.1" max="10">
+                            </div>
+                            <div class="input-group">
+                                <label for="kenarBandi">📎 Bant (mm)</label>
+                                <input type="number" id="kenarBandi" value="0.4" step="0.1" min="0.1" max="5">
+                            </div>
+                            <div class="input-group">
+                                <label for="fugaBosluk">🔀 Fuga (mm)</label>
+                                <input type="number" id="fugaBosluk" value="2" step="0.1" min="0.1" max="10">
+                            </div>
+                            <div id="rayBoslukDiv" class="input-group hidden">
+                                <label for="rayBosluk">🛤️ Ray (mm)</label>
+                                <input type="number" id="rayBosluk" value="26" step="1" min="1" max="100">
+                            </div>
                         </div>
-                     </div>
+                    </div>
                 </div>
 
                 <!-- Cabinet Form Card -->
                 <div class="card">
-                    <h2 id="formBasligi" class="text-xl font-semibold text-gray-700 border-b pb-3 mb-4">Yeni Kabin Ekle</h2>
+                    <h2 id="formBasligi" class="section-title text-xl font-bold text-gray-700">Yeni Kabin Ekle</h2>
                     <form class="space-y-4" id="cabinetForm" onsubmit="return false;">
-                        <div class="select-group"><label for="kabinTipi">Kabin Tipi</label><select id="kabinTipi"><option value="standart" selected>Standart Kapaklı</option><option value="cekmeceli">Çekmeceli</option></select></div>
-                        <div class="input-group"><label for="kabinAdi">Kabin Adı</label><input type="text" id="kabinAdi" value="Alt Modül"></div>
-                        <div class="grid grid-cols-2 gap-3">
-                           <div class="input-group"><label for="genislik">Genişlik(cm)</label><input type="number" id="genislik" value="80"></div>
-                           <div class="input-group"><label for="yukseklik">Yükseklik(cm)</label><input type="number" id="yukseklik" value="72"></div>
-                           <div class="input-group"><label for="derinlik">Derinlik(cm)</label><input type="number" id="derinlik" value="56"></div>
-                           <div id="rafInputDiv" class="input-group"><label for="rafSayisi">Raf Sayısı</label><input type="number" id="rafSayisi" value="1"></div>
-                           <div id="kapakInputDiv" class="input-group"><label for="kapakSayisi">Kapak Sayısı</label><input type="number" id="kapakSayisi" value="2" min="1" max="2"></div>
-                           <div id="cekmeceInputDiv" class="hidden input-group"><label for="cekmeceSayisi">Çekmece Sayısı</label><input type="number" id="cekmeceSayisi" value="3"></div>
+                        <div class="select-group">
+                            <label for="kabinTipi">🏠 Kabin Tipi</label>
+                            <select id="kabinTipi">
+                                <option value="standart" selected>Standart Kapaklı</option>
+                                <option value="cekmeceli">Çekmeceli</option>
+                            </select>
                         </div>
-                        <div class="select-group"><label for="arkalikTipi">Arkalık Tipi</label><select id="arkalikTipi"><option value="kanalli" selected>Kanallı (İçe Geçme)</option><option value="icte">Komple İçten</option></select></div>
-                        <div class="flex items-center gap-2 pt-2"><input type="checkbox" id="kenarBantiUygula" checked><label for="kenarBantiUygula" class="mb-0">Kapak/Raflara Kenar Bandı Uygula</label></div>
-                        <div class="pt-2">
-                            <button id="formSubmitButton" type="button" class="btn btn-full btn-primary">Kabini Projeye Ekle</button>
-                            <button id="formCancelButton" type="button" class="btn btn-full btn-secondary mt-2 hidden">İptal</button>
+                        <div class="input-group">
+                            <label for="kabinAdi">📝 Kabin Adı</label>
+                            <input type="text" id="kabinAdi" value="Alt Modül" placeholder="Kabin adını giriniz">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="input-group">
+                                <label for="genislik">↔️ Genişlik (cm)</label>
+                                <input type="number" id="genislik" value="80" min="10" max="500">
+                            </div>
+                            <div class="input-group">
+                                <label for="yukseklik">↕️ Yükseklik (cm)</label>
+                                <input type="number" id="yukseklik" value="72" min="10" max="500">
+                            </div>
+                            <div class="input-group">
+                                <label for="derinlik">⬇️ Derinlik (cm)</label>
+                                <input type="number" id="derinlik" value="56" min="10" max="200">
+                            </div>
+                            <div id="rafInputDiv" class="input-group">
+                                <label for="rafSayisi">📚 Raf Sayısı</label>
+                                <input type="number" id="rafSayisi" value="1" min="0" max="20">
+                            </div>
+                            <div id="kapakInputDiv" class="input-group">
+                                <label for="kapakSayisi">🚪 Kapak Sayısı</label>
+                                <input type="number" id="kapakSayisi" value="2" min="1" max="4">
+                            </div>
+                            <div id="cekmeceInputDiv" class="hidden input-group">
+                                <label for="cekmeceSayisi">🗃️ Çekmece Sayısı</label>
+                                <input type="number" id="cekmeceSayisi" value="3" min="1" max="10">
+                            </div>
+                        </div>
+                        <div class="select-group">
+                            <label for="arkalikTipi">🔲 Arkalık Tipi</label>
+                            <select id="arkalikTipi">
+                                <option value="kanalli" selected>Kanallı (İçe Geçme)</option>
+                                <option value="icte">Komple İçten</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-3 pt-2">
+                            <input type="checkbox" id="kenarBantiUygula" checked class="w-4 h-4">
+                            <label for="kenarBantiUygula" class="mb-0 text-sm font-medium">
+                                📎 Kapak/Raflara Kenar Bandı Uygula
+                            </label>
+                        </div>
+                        <div class="pt-4 space-y-3">
+                            <button id="formSubmitButton" type="button" class="btn btn-full btn-primary">
+                                ➕ Kabini Projeye Ekle
+                            </button>
+                            <button id="formCancelButton" type="button" class="btn btn-full btn-secondary hidden">
+                                ❌ İptal
+                            </button>
                         </div>
                     </form>
                 </div>
             </div>
 
-            <!-- Middle Column: Project List -->
+            <!-- Cabinet List -->
             <div class="lg:col-span-3">
                 <div class="card">
-                    <h2 class="text-xl font-semibold text-gray-700 border-b pb-3 mb-4">Proje Kabinleri</h2>
-                    <div id="projeListesi" class="space-y-3 max-h-[80vh] overflow-y-auto pr-2"></div>
+                    <h2 class="section-title text-xl font-bold text-gray-700">Proje Kabinleri</h2>
+                    <div id="projectStats" class="stats-card mb-4">
+                        <div class="grid grid-cols-2 gap-4 text-center">
+                            <div>
+                                <div class="text-2xl font-bold text-blue-600" id="totalCabinets">0</div>
+                                <div class="text-sm text-gray-600">Toplam Kabin</div>
+                            </div>
+                            <div>
+                                <div class="text-2xl font-bold text-green-600" id="totalVolume">0</div>
+                                <div class="text-sm text-gray-600">Toplam Hacim (m³)</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="projeListesi" class="space-y-4 max-h-[70vh] overflow-y-auto pr-2"></div>
                 </div>
             </div>
-            
-            <!-- Right Column: Optimization Results -->
+
+            <!-- Optimization Results -->
             <div class="lg:col-span-6">
                 <div class="card space-y-6">
-                    <div class="flex flex-wrap justify-between items-center border-b pb-3 gap-2">
-                        <h2 class="text-xl font-semibold text-gray-700">Genel Kesim ve Optimizasyon</h2>
-                        <button id="calculateBtn" class="btn btn-sm btn-secondary">Hesapla ve Optimize Et</button>
-                    </div>
-                    <div id="govdeOptimizasyonAlani">
-                        <h3 class="text-lg font-semibold text-gray-600 mb-2">Gövde ve Kapak Kesim Listesi</h3>
-                        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                            <div class="overflow-auto max-h-[40vh] table-sticky-header"><table class="w-full text-left text-sm"><thead class="bg-gray-100"><tr><th class="p-2 font-semibold">Adet</th><th class="p-2 font-semibold">Parça Adı</th><th class="p-2 font-semibold">Net Ölçü (BoyxEn)</th></tr></thead><tbody id="kesimListesiBodyGovde"></tbody></table></div>
-                            <div>
-                                <div class="flex items-center justify-between mb-2"><h4 class="font-semibold text-gray-600">Optimizasyon Şemaları</h4><div id="optimizasyonBilgiGovde" class="text-sm text-right"></div></div>
-                                <div id="canvasContainerGovde" class="space-y-4"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <hr/>
-                    <div id="arkalikOptimizasyonAlani">
-                        <h3 class="text-lg font-semibold text-gray-600 mb-2">Arkalık Kesim Listesi</h3>
-                        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                            <div class="overflow-auto max-h-[40vh] table-sticky-header"><table class="w-full text-left text-sm"><thead class="bg-gray-100"><tr><th class="p-2 font-semibold">Adet</th><th class="p-2 font-semibold">Parça Adı</th><th class="p-2 font-semibold">Net Ölçü (BoyxEn)</th></tr></thead><tbody id="kesimListesiBodyArkalik"></tbody></table></div>
-                            <div>
-                                <div class="flex items-center justify-between mb-2"><h4 class="font-semibold text-gray-600">Optimizasyon Şemaları</h4><div id="optimizasyonBilgiArkalik" class="text-sm text-right"></div></div>
-                                <div id="canvasContainerArkalik" class="space-y-4"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
-    <footer class="text-center mt-8 text-sm text-gray-500"><p>Ahmet Burak Karakuş Tarafından Geliştirildi (Yerel Versiyon)</p></footer>
-
-    <script type="module">
-        // --- GLOBAL STATE ---
-        const appState = {
-            projectData: { kabinler: [], ayarlar: {} },
-            ui: { editingCabinetId: null },
-            mevcutPlakaGovde: { ad: "Standart Büyük", w: 183, h: 366 },
-            mevcutPlakaArkalik: { ad: "Standart Arkalık", w: 210, h: 280 },
-        };
-        
-        // --- CONSTANTS ---
-        const ARKALIK_KANAL_PAYI_CM = 1.8;
-        const CEKMECE_KASA_ARKA_BOSLUK_CM = 6;
-        const CEKMECE_KASA_DUSUM_PAYI_CM = 4;
-        const RAF_DERINLIK_BOSLUK_CM = 1;
-
-        // --- DOM ELEMENTS ---
-        const UIElements = {
-            projectTitle: document.getElementById('projectTitle'),
-            newProjectBtn: document.getElementById('newProjectBtn'),
-            calculateBtn: document.getElementById('calculateBtn'),
-            projeListesi: document.getElementById('projeListesi'),
-            settingsInputs: document.querySelectorAll('#birlesimTipi, #govdeKalinligi, #arkalikKalinligi, #testerePayi, #kenarBandi, #fugaBosluk, #rayBosluk'),
-            cabinetForm: document.getElementById('cabinetForm'),
-            formSubmitButton: document.getElementById('formSubmitButton'),
-            formCancelButton: document.getElementById('formCancelButton'),
-            formBasligi: document.getElementById('formBasligi')
-        };
-        
-        // --- INITIALIZATION ---
-        document.addEventListener('DOMContentLoaded', main);
-        
-        function main() {
-            setupEventListeners();
-            createNewProject(); 
-        }
-        
-        // --- EVENT LISTENERS ---
-        function setupEventListeners() {
-            UIElements.newProjectBtn.addEventListener('click', () => {
-                confirmAction('Yeni bir projeye başlamak istediğinizden emin misiniz? Mevcut projedeki tüm veriler silinecek.', createNewProject);
-            });
-
-            UIElements.settingsInputs.forEach(input => input.addEventListener('change', hesaplaGlobal));
-            UIElements.formSubmitButton.addEventListener('click', kabiniEkleVeyaGuncelle);
-            UIElements.formCancelButton.addEventListener('click', duzenlemeyiIptalEt);
-            document.getElementById('kabinTipi').addEventListener('change', kabinTipiDegisti);
-            UIElements.calculateBtn.addEventListener('click', hesaplaGlobal);
-        }
-        
-        // --- PROJECT MANAGEMENT (LOCAL) ---
-        function createNewProject() {
-            appState.projectData = {
-                kabinler: [],
-                ayarlar: getDefaultSettings()
-            };
-            updateUIFromState();
-            console.log("Yeni proje başlatıldı.");
-        }
-
-        // --- UI & DOM MANIPULATION ---
-        function updateUIFromState() {
-            const settings = appState.projectData.ayarlar;
-            for (const key in settings) {
-                const el = document.getElementById(key);
-                if (el) el.value = settings[key];
-            }
-            projeyiGoster();
-            hesaplaGlobal();
-            duzenlemeyiIptalEt();
-        }
-
-        function projeyiGoster() {
-            const listeEl = UIElements.projeListesi;
-            listeEl.innerHTML = '';
-            if (!appState.projectData.kabinler || appState.projectData.kabinler.length === 0) {
-                listeEl.innerHTML = '<p class="text-gray-500 text-center p-4">Bu projede henüz kabin yok.</p>';
-            } else {
-                appState.projectData.kabinler.forEach(k => {
-                    const div = document.createElement('div');
-                    div.className = 'p-3 border rounded-lg bg-gray-50 flex justify-between items-center';
-                    div.innerHTML = `
-                        <div>
-                            <p class="font-semibold">${k.ad} (${k.tip === 'standart' ? k.kapak + ' Kapaklı' : k.cekmece + ' Çekmeceli'})</p>
-                            <p class="text-xs text-gray-600">${k.gen}x${k.yuk}x${k.der} cm</p>
-                        </div>
+                    <div class="flex flex-wrap justify-between items-center gap-2">
+                        <h2 class="section-title text-xl font-bold text-gray-700">Kesim ve Optimizasyon</h2>
                         <div class="flex gap-2">
-                            <button onclick="window.kabiniDuzenle('${k.id}')" class="btn btn-sm btn-icon bg-yellow-400 hover:bg-yellow-500 text-white" title="Düzenle">✏️</button>
-                            <button onclick="window.confirmKabiniSil('${k.id}')" class="btn btn-sm btn-icon bg-red-500 hover:bg-red-600 text-white" title="Sil">🗑️</button>
-                        </div>`;
-                    listeEl.appendChild(div);
-                });
-            }
-        }
-
-        function getSettingsFromUI() {
-            const settings = {};
-            UIElements.settingsInputs.forEach(input => {
-                settings[input.id] = isNaN(parseFloat(input.value)) ? input.value : parseFloat(input.value);
-            });
-            return settings;
-        }
-        
-        function getDefaultSettings() {
-             const settings = {};
-             UIElements.settingsInputs.forEach(input => {
-                 const value = input.defaultValue || (input.options ? input.options[0].value : '');
-                 settings[input.id] = isNaN(parseFloat(value)) ? value : parseFloat(value);
-            });
-            return settings;
-        }
-
-        function kabinTipiDegisti() {
-            const tip = document.getElementById('kabinTipi').value;
-            const isCekmeceli = tip === 'cekmeceli';
-            
-            document.getElementById('rafInputDiv').classList.toggle('hidden', isCekmeceli);
-            document.getElementById('kapakInputDiv').classList.toggle('hidden', isCekmeceli);
-            document.getElementById('cekmeceInputDiv').classList.toggle('hidden', !isCekmeceli);
-            document.getElementById('rayBoslukDiv').classList.toggle('hidden', !isCekmeceli);
-
-            if (!appState.ui.editingCabinetId) {
-                 document.getElementById('kabinAdi').value = isCekmeceli ? "Çekmeceli Modül" : "Alt Modül";
-            }
-        }
-
-        function kabiniEkleVeyaGuncelle() {
-            const formData = {
-                tip: document.getElementById('kabinTipi').value, 
-                ad: document.getElementById('kabinAdi').value || 'İsimsiz', 
-                gen: parseFloat(document.getElementById('genislik').value), 
-                yuk: parseFloat(document.getElementById('yukseklik').value), 
-                der: parseFloat(document.getElementById('derinlik').value), 
-                raf: parseInt(document.getElementById('rafSayisi').value), 
-                kapak: parseInt(document.getElementById('kapakSayisi').value), 
-                cekmece: parseInt(document.getElementById('cekmeceSayisi').value), 
-                arkalikTipi: document.getElementById('arkalikTipi').value,
-                bant: document.getElementById('kenarBantiUygula').checked
-            };
-
-            if (appState.ui.editingCabinetId) {
-                const index = appState.projectData.kabinler.findIndex(k => k.id === appState.ui.editingCabinetId);
-                if (index !== -1) {
-                    appState.projectData.kabinler[index] = { ...appState.projectData.kabinler[index], ...formData };
-                }
-            } else {
-                appState.projectData.kabinler.push({ id: `kabin_${Date.now()}`, ...formData });
-            }
-            updateUIFromState();
-        }
-
-        window.kabiniDuzenle = (id) => {
-            const kabin = appState.projectData.kabinler.find(k => k.id === id);
-            if (!kabin) return;
-
-            appState.ui.editingCabinetId = id;
-
-            document.getElementById('kabinTipi').value = kabin.tip;
-            kabinTipiDegisti();
-            document.getElementById('kabinAdi').value = kabin.ad;
-            document.getElementById('genislik').value = kabin.gen;
-            document.getElementById('yukseklik').value = kabin.yuk;
-            document.getElementById('derinlik').value = kabin.der;
-            document.getElementById('rafSayisi').value = kabin.raf;
-            document.getElementById('kapakSayisi').value = kabin.kapak;
-            document.getElementById('cekmeceSayisi').value = kabin.cekmece;
-            document.getElementById('arkalikTipi').value = kabin.arkalikTipi;
-            document.getElementById('kenarBantiUygula').checked = kabin.bant;
-
-            UIElements.formBasligi.textContent = "Kabini Düzenle";
-            UIElements.formSubmitButton.textContent = "Değişiklikleri Kaydet";
-            UIElements.formSubmitButton.classList.replace('btn-primary', 'bg-yellow-500');
-            UIElements.formSubmitButton.classList.add('text-white');
-            UIElements.formCancelButton.classList.remove('hidden');
-            
-            UIElements.formBasligi.scrollIntoView({ behavior: 'smooth' });
-        }
-        
-        function duzenlemeyiIptalEt() {
-            appState.ui.editingCabinetId = null;
-            UIElements.cabinetForm.reset();
-            kabinTipiDegisti(); 
-            UIElements.formBasligi.textContent = "Yeni Kabin Ekle";
-            UIElements.formSubmitButton.textContent = "Kabini Projeye Ekle";
-            UIElements.formSubmitButton.classList.replace('bg-yellow-500', 'btn-primary');
-            UIElements.formCancelButton.classList.add('hidden');
-        }
-
-        window.confirmKabiniSil = (id) => {
-            confirmAction('Bu kabini projeden silmek istediğinizden emin misiniz?', () => {
-                appState.projectData.kabinler = appState.projectData.kabinler.filter(k => k.id !== id);
-                updateUIFromState();
-            });
-        }
-        
-        // --- CALCULATION LOGIC ---
-        function getCalculationSettings() {
-             const settings = appState.projectData.ayarlar;
-             return {
-                govdeKalinlik: parseFloat(settings.govdeKalinligi) / 10,
-                arkalikKalinlik: parseFloat(settings.arkalikKalinligi) / 10,
-                testerePayi: parseFloat(settings.testerePayi) / 10,
-                bantKalinlik: parseFloat(settings.kenarBandi) / 10,
-                fugaBosluk: parseFloat(settings.fugaBosluk) / 10,
-                rayBosluk: parseFloat(settings.rayBosluk) / 10,
-                birlesimTipi: settings.birlesimTipi
-            };
-        }
-        
-        function hesaplaGlobal(){
-            if (!appState.projectData.ayarlar || Object.keys(appState.projectData.ayarlar).length === 0) {
-                appState.projectData.ayarlar = getDefaultSettings();
-            };
-            const projeAyarlari = getCalculationSettings();
-            
-            document.querySelector('#govdeOptimizasyonAlani h3').textContent = `Gövde ve Kapak Kesim Listesi (${projeAyarlari.govdeKalinlik*10}mm)`;
-            document.querySelector('#arkalikOptimizasyonAlani h3').textContent = `Arkalık Kesim Listesi (${projeAyarlari.arkalikKalinlik*10}mm)`;
-
-            if (!appState.projectData.kabinler || appState.projectData.kabinler.length === 0) {
-                gosterKesimListesi([], 'kesimListesiBodyGovde');
-                gosterKesimListesi([], 'kesimListesiBodyArkalik');
-                optimizeVeCiz('canvasContainerGovde', 'optimizasyonBilgiGovde', [], appState.mevcutPlakaGovde, 'Gövde');
-                optimizeVeCiz('canvasContainerArkalik', 'optimizasyonBilgiArkalik', [], appState.mevcutPlakaArkalik, 'Arkalık');
-                return;
-            }
-
-            let tumGovdeParcalari = [];
-            let tumArkalikParcalari = [];
-
-            appState.projectData.kabinler.forEach(kabin => {
-                const { govde, arkalik } = kabinParcalarınıHesapla(kabin, projeAyarlari);
-                tumGovdeParcalari.push(...govde);
-                tumArkalikParcalari.push(...arkalik);
-            });
-
-            const govdeListesi = birlestirVeGrupla(tumGovdeParcalari);
-            const arkalikListesi = birlestirVeGrupla(tumArkalikParcalari);
-            gosterKesimListesi(govdeListesi, 'kesimListesiBodyGovde');
-            gosterKesimListesi(arkalikListesi, 'kesimListesiBodyArkalik');
-
-            const govdeOptimizasyonParcalari = govdeListesi.flatMap(p => Array.from({ length: p.count }, () => ({ w: p.w_kesim, h: p.h_kesim, net_w: p.w, net_h: p.h, ad: p.ad })));
-            const arkalikOptimizasyonParcalari = arkalikListesi.flatMap(p => Array.from({ length: p.count }, () => ({ w: p.w_kesim, h: p.h_kesim, net_w: p.w, net_h: p.h, ad: p.ad })));
-
-            optimizeVeCiz('canvasContainerGovde', 'optimizasyonBilgiGovde', govdeOptimizasyonParcalari, appState.mevcutPlakaGovde, 'Gövde');
-            optimizeVeCiz('canvasContainerArkalik', 'optimizasyonBilgiArkalik', arkalikOptimizasyonParcalari, appState.mevcutPlakaArkalik, 'Arkalık');
-        }
-
-        function kabinParcalarınıHesapla(kabin, ayarlar) {
-            let govdeParcalari = [];
-            let arkalikParcalari = [];
-            const { govdeKalinlik, arkalikKalinlik, testerePayi, bantKalinlik, fugaBosluk, rayBosluk, birlesimTipi } = ayarlar;
-
-            const icGenislik = kabin.gen - (govdeKalinlik * 2);
-            if (birlesimTipi === 'yandan') {
-                govdeParcalari.push({ net_h: kabin.yuk, net_w: kabin.der, count: 2, ad: 'Yan Dikme'});
-                govdeParcalari.push({ net_h: icGenislik, net_w: kabin.der, count: 2, ad: 'Alt/Üst Tabla' });
-            } else { 
-                govdeParcalari.push({ net_h: kabin.yuk - (govdeKalinlik * 2), net_w: kabin.der, count: 2, ad: 'Yan Dikme'});
-                govdeParcalari.push({ net_h: kabin.gen, net_w: kabin.der, count: 2, ad: 'Alt/Üst Tabla' });
-            }
-            
-            let arkalikGen, arkalikYuk;
-            if (kabin.arkalikTipi === 'kanalli') {
-                arkalikGen = icGenislik + ARKALIK_KANAL_PAYI_CM; 
-                arkalikYuk = (birlesimTipi === 'yandan' ? kabin.yuk - (govdeKalinlik * 2) : kabin.yuk) + ARKALIK_KANAL_PAYI_CM;
-            } else { 
-                arkalikGen = icGenislik; 
-                arkalikYuk = birlesimTipi === 'yandan' ? kabin.yuk - (govdeKalinlik * 2) : kabin.yuk;
-            }
-            arkalikParcalari.push({net_h: arkalikYuk, net_w: arkalikGen, count: 1, ad: 'Arkalık'});
-            
-            if (kabin.tip === 'cekmeceli' && kabin.cekmece > 0) {
-                const toplamFuga = (kabin.cekmece + 1) * fugaBosluk;
-                let cekmeceKapakYukseklik = (kabin.yuk - toplamFuga) / kabin.cekmece;
-                let cekmeceKapakGenislik = kabin.gen - (2 * fugaBosluk);
-                if (kabin.bant) {
-                    cekmeceKapakYukseklik -= (bantKalinlik * 2);
-                    cekmeceKapakGenislik -= (bantKalinlik * 2);
-                }
-                govdeParcalari.push({net_h: cekmeceKapakYukseklik, net_w: cekmeceKapakGenislik, count: kabin.cekmece, ad: 'Çekmece Önü'});
-                
-                const kasaYukseklik = cekmeceKapakYukseklik - CEKMECE_KASA_DUSUM_PAYI_CM;
-                const kasaDerinlik = kabin.der - CEKMECE_KASA_ARKA_BOSLUK_CM;
-                const kasaDisGenislik = icGenislik - rayBosluk;
-                const kasaIcGenislik = kasaDisGenislik - (2 * govdeKalinlik);
-                govdeParcalari.push({net_h: kasaYukseklik, net_w: kasaDerinlik, count: kabin.cekmece * 2, ad: 'Kasa Yanı'});
-                govdeParcalari.push({net_h: kasaYukseklik, net_w: kasaIcGenislik, count: kabin.cekmece * 2, ad: 'Kasa Ön/Arka'});
-                
-                const dipGenislik = kasaIcGenislik;
-                const dipDerinlik = kasaDerinlik - (2 * govdeKalinlik);
-                arkalikParcalari.push({net_h: dipDerinlik, net_w: dipGenislik, count: kabin.cekmece, ad: 'Çekmece Dibi'});
-
-            } else if (kabin.tip === 'standart') {
-                if (kabin.raf > 0) {
-                    let rafGen = icGenislik;
-                    let rafDer = kabin.der - RAF_DERINLIK_BOSLUK_CM;
-                    if (kabin.bant) rafDer -= bantKalinlik;
-                    govdeParcalari.push({ net_h: rafGen, net_w: rafDer, count: kabin.raf, ad: 'Raf' });
-                }
-                if (kabin.kapak > 0) {
-                    let kapakYuk = kabin.yuk - (fugaBosluk * 2);
-                    if (kabin.bant) kapakYuk -= (bantKalinlik * 2);
-
-                    if (kabin.kapak === 1) {
-                        let kapakGen = kabin.gen - (fugaBosluk * 2);
-                        if (kabin.bant) kapakGen -= (bantKalinlik * 2);
-                        govdeParcalari.push({net_h: kapakYuk, net_w: kapakGen, count: 1, ad: 'Kapak'});
-                    } else if (kabin.kapak === 2) {
-                        let kapakGen = (kabin.gen - (fugaBosluk * 3)) / 2;
-                        if (kabin.bant) kapakGen -= (bantKalinlik * 2);
-                        govdeParcalari.push({net_h: kapakYuk, net_w: kapakGen, count: 2, ad: 'Kapak'});
-                    }
-                }
-            }
-            
-            const addKerf = (p) => ({ ...p, h: p.net_h, w: p.net_w, h_kesim: p.net_h + testerePayi, w_kesim: p.net_w + testerePayi });
-            return { govde: govdeParcalari.map(addKerf), arkalik: arkalikParcalari.map(addKerf) };
-        }
-
-        function birlestirVeGrupla(parcalar) {
-            const gruplu = {};
-            parcalar.forEach(p => {
-                const key = `${p.ad}_${p.h.toFixed(2)}x${p.w.toFixed(2)}`;
-                if (gruplu[key]) {
-                    gruplu[key].count += p.count;
-                } else {
-                    gruplu[key] = { ...p };
-                }
-            });
-            return Object.values(gruplu);
-        }
-
-        function gosterKesimListesi(parcalar, tbodyId) {
-            const tbody = document.getElementById(tbodyId);
-            tbody.innerHTML = '';
-            parcalar.sort((a,b) => b.h - a.h || b.w - a.w);
-            parcalar.forEach(p => { 
-                tbody.innerHTML += `<tr class="border-b last:border-b-0"><td class="p-2 font-bold">${p.count}</td><td class="p-2 font-medium">${p.ad}</td><td class="p-2">${p.h.toFixed(1)}x${p.w.toFixed(1)}</td></tr>`; 
-            });
-        }
-        
-        // --- OPTIMIZATION & DRAWING ---
-        const GuillotineShelfPacker = {
-            pack: function(items, sheetWidth, sheetHeight, allowRotation = true) {
-                let remainingItems = items.map((item, index) => ({...item, id: index, original_w: item.w, original_h: item.h, packed: false}));
-                remainingItems.sort((a, b) => b.h - a.h || b.w - a.w);
-                
-                let packedItems = [];
-                let currentY = 0;
-
-                while(remainingItems.filter(item => !item.packed).length > 0) {
-                    let shelfHeight = 0, currentX = 0;
-                    const firstUnpacked = remainingItems.find(i => !i.packed);
-                    if(!firstUnpacked) break;
-                    
-                    if(firstUnpacked.h <= sheetHeight - currentY) shelfHeight = firstUnpacked.h;
-                    else if (allowRotation && firstUnpacked.w <= sheetHeight - currentY) shelfHeight = firstUnpacked.w; 
-                    else break; 
-                    if(currentY + shelfHeight > sheetHeight) break;
-                    
-                    let shelfItems = [];
-                    for (let i = 0; i < remainingItems.length; i++) {
-                        const item = remainingItems[i];
-                        if(item.packed) continue;
-
-                        let fit = false, rotated = false;
-                        if ((currentX + item.w <= sheetWidth) && (item.h <= shelfHeight)) {
-                           fit = true; rotated = false;
-                        } else if (allowRotation && (currentX + item.h <= sheetWidth) && (item.w <= shelfHeight)) {
-                           fit = true; rotated = true;
-                        }
-                        
-                        if(fit){
-                            item.packed = true;
-                            shelfItems.push({item: item, x: currentX, y: currentY, rotated: rotated});
-                            currentX += rotated ? item.h : item.w;
-                        }
-                    }
-
-                    shelfItems.forEach(packed => {
-                        packed.item.fit = {x: packed.x, y: packed.y, rotated: packed.rotated};
-                        packedItems.push(packed.item);
-                    });
-                    
-                    currentY += shelfHeight;
-                }
-
-                packedItems.forEach(item => {
-                    item.w = item.fit.rotated ? item.original_h : item.original_w;
-                    item.h = item.fit.rotated ? item.original_w : item.original_h;
-                });
-                
-                const unpackedItems = remainingItems.filter(item => !item.packed).map(item => ({w: item.original_w, h: item.original_h, net_w: item.net_w, net_h: item.net_h, ad: item.ad}));
-                return { packed: packedItems, unpacked: unpackedItems };
-            }
-        };
-
-        function runFullOptimization(items, sheetWidth, sheetHeight) {
-            const allSheets = [];
-            let itemsToPack = JSON.parse(JSON.stringify(items));
-            while (itemsToPack.length > 0) {
-                const result = GuillotineShelfPacker.pack(itemsToPack, sheetWidth, sheetHeight);
-                if (result.packed.length === 0) {
-                    console.error("Kalan parçalar plakaya sığmıyor:", result.unpacked);
-                    break;
-                }
-                allSheets.push(result.packed);
-                itemsToPack = result.unpacked;
-            }
-            return allSheets;
-        }
-
-        function optimizeVeCiz(containerId, infoId, boxes, plaka, typeName) {
-            const canvasContainer = document.getElementById(containerId);
-            const infoEl = document.getElementById(infoId);
-            canvasContainer.innerHTML = '';
-
-            if (boxes.length === 0) {
-                infoEl.innerHTML = ''; return;
-            }
-
-            const allPackedSheets = runFullOptimization(boxes, plaka.w, plaka.h);
-            infoEl.innerHTML = `<p class="font-semibold">${allPackedSheets.length} Adet ${plaka.ad} (${plaka.w}x${plaka.h})</p>`;
-
-            allPackedSheets.forEach((packedItems, index) => {
-                const sheetWrapper = document.createElement('div');
-                sheetWrapper.className = 'border rounded-lg p-2';
-                const sheetTitle = document.createElement('h5');
-                sheetTitle.className = 'text-sm font-semibold mb-2 text-center';
-                const canvas = document.createElement('canvas');
-                canvas.style.width = '100%'; canvas.style.height = 'auto';
-                sheetWrapper.append(sheetTitle, canvas);
-                canvasContainer.appendChild(sheetWrapper);
-
-                const drawSheet = () => {
-                    const baseWidth = canvas.parentElement.clientWidth;
-                    if (!baseWidth) return;
-                    
-                    const scale = baseWidth / plaka.w;
-                    canvas.width = baseWidth; canvas.height = plaka.h * scale;
-                    const ctx = canvas.getContext('2d');
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    ctx.strokeStyle = '#9ca3af'; ctx.lineWidth = 1;
-                    ctx.strokeRect(0, 0, canvas.width, canvas.height);
-
-                    let totalArea = 0;
-                    packedItems.forEach(box => {
-                        if (!box.fit) return;
-                        ctx.fillStyle = typeName === 'Arkalık' ? 'rgba(128, 90, 213, 0.7)' : 'rgba(59, 130, 246, 0.7)';
-                        ctx.strokeStyle = typeName === 'Arkalık' ? '#6d28d9' : '#1d4ed8';
-                        ctx.lineWidth = 1;
-                        const [rectX, rectY, rectW, rectH] = [box.fit.x * scale, box.fit.y * scale, box.w * scale, box.h * scale];
-                        ctx.fillRect(rectX, rectY, rectW, rectH);
-                        ctx.strokeRect(rectX, rectY, rectW, rectH);
-                        
-                        if (rectW > 40 && rectH > 15) {
-                            ctx.fillStyle = '#ffffff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                            const fontSize = Math.min(rectH / 5, 10);
-                            ctx.font = `bold ${fontSize}px Inter`;
-                            const textX = rectX + rectW / 2;
-                            const textY = rectY + rectH / 2;
-                            ctx.fillText(box.ad, textX, textY - (fontSize / 2));
-                            ctx.fillText(`${box.net_w.toFixed(1)}x${box.net_h.toFixed(1)}`, textX, textY + (fontSize / 2) + 2);
-                        }
-                        totalArea += box.net_w * box.net_h;
-                    });
-                    const efficiency = (totalArea / (plaka.w * plaka.h)) * 100;
-                    sheetTitle.textContent = `${index + 1}. Plaka (Verim: ${efficiency.toFixed(1)}%)`;
-                };
-                
-                const observer = new ResizeObserver(drawSheet);
-                observer.observe(canvas.parentElement);
-                drawSheet();
-            });
-        }
-        
-        // --- MODALS & UTILITY ---
-        function showModal(title, message) {
-            const modal = document.getElementById('customModal');
-            document.getElementById('modalTitle').textContent = title;
-            document.getElementById('modalBody').innerHTML = `<p class="text-gray-600">${message}</p>`;
-            document.getElementById('modalActions').innerHTML = `<button class="btn btn-sm btn-primary" onclick="window.closeModal()">Tamam</button>`;
-            modal.classList.add('visible');
-        }
-
-        function confirmAction(message, callback) {
-            const modal = document.getElementById('customModal');
-            document.getElementById('modalTitle').textContent = 'Onay Gerekli';
-            document.getElementById('modalBody').innerHTML = `<p class="text-gray-600">${message}</p>`;
-            document.getElementById('modalActions').innerHTML = `
-                <button id="confirmCancel" class="btn btn-sm btn-secondary">İptal</button>
-                <button id="confirmOk" class="btn btn-sm btn-danger">Onayla</button>
-            `;
-            document.getElementById('confirmOk').onclick = () => { callback(); closeModal(); };
-            document.getElementById('confirmCancel').onclick = closeModal;
-            modal.classList.add('visible');
-        }
-
-        window.closeModal = () => {
-            document.getElementById('customModal').classList.remove('visible');
-        }
-
-    </script>
-</body>
-</ht
+                            <button id="exportBtn" class="btn btn-sm btn-warning tooltip" data-tooltip="Sonuçları Dışa Aktar">
+                                📤 Dışa Aktar
+         
