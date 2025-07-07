@@ -3,22 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ensar Mobilya - Proje Hesaplayıcı v13 Pro</title>
+    <title>Ensar Mobilya - Proje Hesaplayıcı Pro v4 (Malzeme Gruplama)</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- PDF Export Kütüphaneleri -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Teko:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
             min-height: 100vh;
-        }
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
         .logo { 
             font-family: 'Teko', sans-serif; 
@@ -29,16 +26,16 @@
             text-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         .card { 
-            background: rgba(255, 255, 255, 0.98);
+            background: white;
             border-radius: 1rem; 
             padding: 1.5rem; 
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e5e7eb;
             transition: all 0.3s ease;
         }
         .card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
         }
         .input-group label, .select-group label { 
             display: block; 
@@ -55,14 +52,14 @@
             border: 2px solid #e5e7eb; 
             border-radius: 0.75rem; 
             transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.9);
+            background: #f9fafb;
             font-weight: 500;
         }
         .input-group input:focus, .select-group select:focus { 
             outline: none; 
             border-color: #667eea; 
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
-            transform: scale(1.02);
+            background: white;
         }
         .btn { 
             padding: 0.75rem 1.5rem; 
@@ -76,213 +73,41 @@
             letter-spacing: 0.5px;
             position: relative;
             overflow: hidden;
-        }
-        .btn:before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            transition: left 0.5s;
-        }
-        .btn:hover:before {
-            left: 100%;
-        }
-        .btn:disabled { 
-            background-color: #9ca3af; 
-            cursor: not-allowed;
-            transform: none;
-        }
-        .btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-        }
-        .btn-full { width: 100%; }
-        .btn-sm { padding: 0.5rem 1rem; font-size: 0.875rem; }
-        .btn-primary { 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white; 
-        }
-        .btn-secondary { 
-            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
-            color: white; 
-        }
-        .btn-danger { 
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            color: white; 
-        }
-        .btn-warning { 
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            color: white; 
-        }
-        .btn-success { 
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white; 
-        }
-        .btn-icon { 
-            padding: 0.6rem; 
-            line-height: 1;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
+            gap: 0.5rem;
         }
-        .table-sticky-header thead th { 
-            position: sticky; 
-            top: 0; 
-            z-index: 10; 
-            background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
-            backdrop-filter: blur(10px);
+        .btn:disabled { 
+            background: #d1d5db;
+            color: #6b7280;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
-        .modal-overlay { 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            right: 0; 
-            bottom: 0; 
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(5px);
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            z-index: 1000; 
-            opacity: 0; 
-            visibility: hidden; 
-            transition: all 0.3s ease;
-        }
-        .modal-overlay.visible { 
-            opacity: 1; 
-            visibility: visible; 
-        }
-        .modal-content { 
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
-            padding: 2rem; 
-            border-radius: 1rem; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-            width: 90%; 
-            max-width: 500px; 
-            transform: scale(0.8) translateY(50px);
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .modal-overlay.visible .modal-content { 
-            transform: scale(1) translateY(0);
-        }
-        .cabinet-item {
-            background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(248,250,252,0.9) 100%);
-            border: 2px solid rgba(102, 126, 234, 0.1);
-            border-radius: 1rem;
-            padding: 1.2rem;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        .cabinet-item:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
-            border-color: rgba(102, 126, 234, 0.3);
-        }
-        .cabinet-item:before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .optimization-canvas {
-            border: 2px solid #e5e7eb;
-            border-radius: 0.75rem;
-            background: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-        .optimization-canvas:hover {
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        }
-        .stats-card {
-            background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%);
-            border-radius: 1rem;
-            padding: 1.5rem;
-            border: 1px solid rgba(102, 126, 234, 0.1);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-        .stats-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        }
-        .animate-pulse-custom {
-            animation: pulse-custom 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-        @keyframes pulse-custom {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-        .loading-spinner {
-            border: 3px solid rgba(102, 126, 234, 0.3);
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .header-container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 1rem;
-            padding: 1.5rem;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .section-title {
-            position: relative;
-            padding-bottom: 0.75rem;
-            margin-bottom: 1.5rem;
-        }
-        .section-title:after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 60px;
-            height: 3px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 2px;
-        }
-        .floating-action {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            z-index: 100;
-        }
-        .tooltip {
-            position: relative;
-        }
-        .tooltip:hover:after {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-            white-space: nowrap;
-            z-index: 1000;
-        }
+        .btn-sm { padding: 0.5rem 1rem; font-size: 0.875rem; }
+        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .btn-secondary { background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%); color: white; }
+        .btn-danger { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; }
+        .btn-warning { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; }
+        .btn-success { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; }
+        .btn-icon { padding: 0.6rem; line-height: 1; border-radius: 50%; width: 40px; height: 40px; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+        .modal-overlay.visible { opacity: 1; visibility: visible; }
+        .modal-content { background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 20px 50px rgba(0,0,0,0.2); width: 90%; max-width: 500px; transform: scale(0.8) translateY(50px); transition: all 0.3s ease; }
+        .modal-overlay.visible .modal-content { transform: scale(1) translateY(0); }
+        .cabinet-item { background: #f9fafb; border: 2px solid #e5e7eb; border-radius: 1rem; padding: 1.2rem; transition: all 0.3s ease; position: relative; overflow: hidden; cursor: pointer; }
+        .cabinet-item:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08); border-color: rgba(102, 126, 234, 0.3); }
+        .cabinet-item:before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .stats-card { background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-radius: 1rem; padding: 1.5rem; border: 1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); text-align: center; }
+        .header-container { background: white; border-radius: 1rem; padding: 1.5rem; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.07); border: 1px solid #e5e7eb; }
+        .section-title { position: relative; padding-bottom: 0.75rem; margin-bottom: 1.5rem; }
+        .section-title:after { content: ''; position: absolute; bottom: 0; left: 0; width: 60px; height: 3px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 2px; }
+        .floating-action { position: fixed; bottom: 2rem; right: 2rem; z-index: 100; }
+        .tooltip { position: relative; }
+        .tooltip .tooltip-text { visibility: hidden; width: 140px; background-color: #333; color: #fff; text-align: center; border-radius: 6px; padding: 5px 0; position: absolute; z-index: 1; bottom: 125%; left: 50%; margin-left: -70px; opacity: 0; transition: opacity 0.3s; font-size: 0.75rem; font-weight: 500; }
+        .tooltip:hover .tooltip-text { visibility: visible; opacity: 1; }
+        .table-sticky-header thead th { position: sticky; top: 0; z-index: 10; background: #f9fafb; }
     </style>
 </head>
 <body class="min-h-screen">
@@ -297,8 +122,9 @@
 
     <!-- Floating Action Button -->
     <div class="floating-action">
-        <button id="quickCalculateBtn" class="btn btn-primary btn-icon tooltip" data-tooltip="Hızlı Hesapla">
-            <span class="text-xl">⚡</span>
+        <button id="quickCalculateBtn" class="btn btn-primary btn-icon tooltip">
+             <span class="text-xl">⚡</span>
+             <span class="tooltip-text">Hızlı Hesapla</span>
         </button>
     </div>
 
@@ -308,29 +134,28 @@
             <div class="flex flex-wrap justify-between items-center gap-4">
                 <div class="logo text-5xl font-bold">ENSAR MOBİLYA</div>
                 <div class="text-center flex-1">
-                    <h1 id="projectTitle" class="text-3xl lg:text-4xl font-bold text-gray-800 mb-2">
+                    <h1 id="projectTitle" class="text-3xl lg:text-4xl font-bold text-gray-800 mb-2 cursor-pointer" title="Proje adını değiştirmek için tıklayın">
                         Proje Hesaplayıcı Pro
                     </h1>
                     <p class="text-gray-600 font-medium">Profesyonel Mobilya Optimizasyon Sistemi</p>
                 </div>
                 <div class="flex gap-3">
-                    <button id="saveProjectBtn" class="btn btn-sm btn-success tooltip" data-tooltip="Projeyi Kaydet">
-                        💾 Kaydet
+                    <button id="saveProjectBtn" class="btn btn-sm btn-success tooltip">
+                        💾 <span class="hidden md:inline">Kaydet</span> <span class="tooltip-text">Projeyi Kaydet</span>
                     </button>
-                    <button id="loadProjectBtn" class="btn btn-sm btn-warning tooltip" data-tooltip="Proje Yükle">
-                        📂 Yükle
+                    <button id="loadProjectBtn" class="btn btn-sm btn-warning tooltip">
+                        📂 <span class="hidden md:inline">Yükle</span> <span class="tooltip-text">Proje Yükle</span>
                     </button>
-                    <button id="newProjectBtn" class="btn btn-sm btn-secondary tooltip" data-tooltip="Yeni Proje">
-                        ✨ Yeni Proje
+                    <button id="newProjectBtn" class="btn btn-sm btn-secondary tooltip">
+                        ✨ <span class="hidden md:inline">Yeni</span> <span class="tooltip-text">Yeni Proje</span>
                     </button>
                 </div>
             </div>
         </header>
 
         <main class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <!-- Settings Panel -->
+            <!-- Left Column: Settings & Form -->
             <div class="lg:col-span-3 space-y-6">
-                <!-- Settings Card -->
                 <div class="card">
                     <h2 class="section-title text-xl font-bold text-gray-700">Proje Ayarları</h2>
                     <div class="space-y-4">
@@ -342,126 +167,790 @@
                             </select>
                         </div>
                         <div class="grid grid-cols-2 gap-3">
-                            <div class="input-group">
-                                <label for="govdeKalinligi">📏 Gövde (mm)</label>
-                                <input type="number" id="govdeKalinligi" value="18" min="1" max="50">
-                            </div>
-                            <div class="input-group">
-                                <label for="arkalikKalinligi">🔲 Arkalık (mm)</label>
-                                <input type="number" id="arkalikKalinligi" value="3" min="1" max="20">
-                            </div>
-                            <div class="input-group">
-                                <label for="testerePayi">⚔️ Testere (mm)</label>
-                                <input type="number" id="testerePayi" value="3" step="0.1" min="0.1" max="10">
-                            </div>
-                            <div class="input-group">
-                                <label for="kenarBandi">📎 Bant (mm)</label>
-                                <input type="number" id="kenarBandi" value="0.4" step="0.1" min="0.1" max="5">
-                            </div>
-                            <div class="input-group">
-                                <label for="fugaBosluk">🔀 Fuga (mm)</label>
-                                <input type="number" id="fugaBosluk" value="2" step="0.1" min="0.1" max="10">
-                            </div>
-                            <div id="rayBoslukDiv" class="input-group hidden">
-                                <label for="rayBosluk">🛤️ Ray (mm)</label>
-                                <input type="number" id="rayBosluk" value="26" step="1" min="1" max="100">
-                            </div>
+                            <div class="input-group"><label for="govdeKalinligi">📏 Gövde (mm)</label><input type="number" id="govdeKalinligi" value="18"></div>
+                            <div class="input-group"><label for="arkalikKalinligi">🔲 Arkalık (mm)</label><input type="number" id="arkalikKalinligi" value="3"></div>
+                            <div class="input-group"><label for="testerePayi">⚔️ Testere (mm)</label><input type="number" id="testerePayi" value="3"></div>
+                            <div class="input-group"><label for="kenarBandi">📎 Bant (mm)</label><input type="number" id="kenarBandi" value="0.4"></div>
+                            <div class="input-group"><label for="fugaBosluk">🔀 Fuga (mm)</label><input type="number" id="fugaBosluk" value="2"></div>
+                            <div id="rayBoslukDiv" class="input-group hidden"><label for="rayBosluk">🛤️ Ray (mm)</label><input type="number" id="rayBosluk" value="26"></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Cabinet Form Card -->
                 <div class="card">
                     <h2 id="formBasligi" class="section-title text-xl font-bold text-gray-700">Yeni Kabin Ekle</h2>
                     <form class="space-y-4" id="cabinetForm" onsubmit="return false;">
-                        <div class="select-group">
-                            <label for="kabinTipi">🏠 Kabin Tipi</label>
-                            <select id="kabinTipi">
-                                <option value="standart" selected>Standart Kapaklı</option>
-                                <option value="cekmeceli">Çekmeceli</option>
-                            </select>
-                        </div>
-                        <div class="input-group">
-                            <label for="kabinAdi">📝 Kabin Adı</label>
-                            <input type="text" id="kabinAdi" value="Alt Modül" placeholder="Kabin adını giriniz">
-                        </div>
+                        <div class="select-group"><label for="kabinTipi">🏠 Kabin Tipi</label><select id="kabinTipi"><option value="standart" selected>Standart Kapaklı</option><option value="cekmeceli">Çekmeceli</option></select></div>
+                        <div class="input-group"><label for="kabinAdi">📝 Kabin Adı</label><input type="text" id="kabinAdi" value="Alt Modül" placeholder="Kabin adını giriniz"></div>
                         <div class="grid grid-cols-2 gap-3">
-                            <div class="input-group">
-                                <label for="genislik">↔️ Genişlik (cm)</label>
-                                <input type="number" id="genislik" value="80" min="10" max="500">
-                            </div>
-                            <div class="input-group">
-                                <label for="yukseklik">↕️ Yükseklik (cm)</label>
-                                <input type="number" id="yukseklik" value="72" min="10" max="500">
-                            </div>
-                            <div class="input-group">
-                                <label for="derinlik">⬇️ Derinlik (cm)</label>
-                                <input type="number" id="derinlik" value="56" min="10" max="200">
-                            </div>
-                            <div id="rafInputDiv" class="input-group">
-                                <label for="rafSayisi">📚 Raf Sayısı</label>
-                                <input type="number" id="rafSayisi" value="1" min="0" max="20">
-                            </div>
-                            <div id="kapakInputDiv" class="input-group">
-                                <label for="kapakSayisi">🚪 Kapak Sayısı</label>
-                                <input type="number" id="kapakSayisi" value="2" min="1" max="4">
-                            </div>
-                            <div id="cekmeceInputDiv" class="hidden input-group">
-                                <label for="cekmeceSayisi">🗃️ Çekmece Sayısı</label>
-                                <input type="number" id="cekmeceSayisi" value="3" min="1" max="10">
-                            </div>
+                            <div class="input-group"><label for="genislik">↔️ Genişlik (cm)</label><input type="number" id="genislik" value="80"></div>
+                            <div class="input-group"><label for="yukseklik">↕️ Yükseklik (cm)</label><input type="number" id="yukseklik" value="72"></div>
+                            <div class="input-group"><label for="derinlik">⬇️ Derinlik (cm)</label><input type="number" id="derinlik" value="56"></div>
+                            <div id="rafInputDiv" class="input-group"><label for="rafSayisi">📚 Raf Sayısı</label><input type="number" id="rafSayisi" value="1"></div>
+                            <div id="kapakInputDiv" class="input-group"><label for="kapakSayisi">🚪 Kapak Sayısı</label><input type="number" id="kapakSayisi" value="2"></div>
+                            <div id="cekmeceInputDiv" class="hidden input-group"><label for="cekmeceSayisi">🗃️ Çekmece Sayısı</label><input type="number" id="cekmeceSayisi" value="3"></div>
                         </div>
-                        <div class="select-group">
-                            <label for="arkalikTipi">🔲 Arkalık Tipi</label>
-                            <select id="arkalikTipi">
-                                <option value="kanalli" selected>Kanallı (İçe Geçme)</option>
-                                <option value="icte">Komple İçten</option>
-                            </select>
-                        </div>
-                        <div class="flex items-center gap-3 pt-2">
-                            <input type="checkbox" id="kenarBantiUygula" checked class="w-4 h-4">
-                            <label for="kenarBantiUygula" class="mb-0 text-sm font-medium">
-                                📎 Kapak/Raflara Kenar Bandı Uygula
-                            </label>
-                        </div>
+                        <div class="select-group"><label for="arkalikTipi">🔲 Arkalık Tipi</label><select id="arkalikTipi"><option value="kanalli" selected>Kanallı</option><option value="icte">İçten</option></select></div>
+                        <div class="flex items-center gap-3 pt-2"><input type="checkbox" id="kenarBantiUygula" checked class="w-4 h-4"><label for="kenarBantiUygula" class="mb-0 text-sm font-medium">Kapak/Raflara Kenar Bandı</label></div>
                         <div class="pt-4 space-y-3">
-                            <button id="formSubmitButton" type="button" class="btn btn-full btn-primary">
-                                ➕ Kabini Projeye Ekle
-                            </button>
-                            <button id="formCancelButton" type="button" class="btn btn-full btn-secondary hidden">
-                                ❌ İptal
-                            </button>
+                            <button id="formSubmitButton" type="button" class="btn btn-full btn-primary">➕ Kabini Projeye Ekle</button>
+                            <button id="formCancelButton" type="button" class="btn btn-full btn-secondary hidden">❌ İptal</button>
                         </div>
                     </form>
                 </div>
             </div>
 
-            <!-- Cabinet List -->
+            <!-- Middle Column: Cabinet List -->
             <div class="lg:col-span-3">
                 <div class="card">
                     <h2 class="section-title text-xl font-bold text-gray-700">Proje Kabinleri</h2>
-                    <div id="projectStats" class="stats-card mb-4">
+                    <div class="stats-card mb-4">
                         <div class="grid grid-cols-2 gap-4 text-center">
-                            <div>
-                                <div class="text-2xl font-bold text-blue-600" id="totalCabinets">0</div>
-                                <div class="text-sm text-gray-600">Toplam Kabin</div>
-                            </div>
-                            <div>
-                                <div class="text-2xl font-bold text-green-600" id="totalVolume">0</div>
-                                <div class="text-sm text-gray-600">Toplam Hacim (m³)</div>
-                            </div>
+                            <div><div class="text-2xl font-bold text-blue-600" id="totalCabinets">0</div><div class="text-sm text-gray-600">Toplam Kabin</div></div>
+                            <div><div class="text-2xl font-bold text-green-600" id="totalVolume">0</div><div class="text-sm text-gray-600">Hacim (m³)</div></div>
                         </div>
                     </div>
                     <div id="projeListesi" class="space-y-4 max-h-[70vh] overflow-y-auto pr-2"></div>
                 </div>
             </div>
 
-            <!-- Optimization Results -->
+            <!-- Right Column: Optimization -->
             <div class="lg:col-span-6">
                 <div class="card space-y-6">
                     <div class="flex flex-wrap justify-between items-center gap-2">
                         <h2 class="section-title text-xl font-bold text-gray-700">Kesim ve Optimizasyon</h2>
                         <div class="flex gap-2">
-                            <button id="exportBtn" class="btn btn-sm btn-warning tooltip" data-tooltip="Sonuçları Dışa Aktar">
-                                📤 Dışa Aktar
-         
+                            <button id="exportBtn" class="btn btn-sm btn-danger tooltip" data-tooltip="Sonuçları PDF Olarak İndir">
+                                📄 Dışa Aktar
+                            </button>
+                            <button id="calculateBtn" class="btn btn-sm btn-success tooltip" data-tooltip="Hesaplamayı Başlat">
+                                ⚡ Hesapla
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="statsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Stats will be dynamically inserted here -->
+                    </div>
+
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <div id="plate-plan-header" class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-gray-700">Plaka Kesim Planı</h3>
+                            <div class="flex gap-2 items-center">
+                                <button id="prevPlateBtn" class="btn btn-sm btn-secondary" disabled>◀</button>
+                                <span class="px-3 py-1 bg-gray-100 rounded-lg font-medium text-sm">
+                                    <span id="currentPlate">0</span> / <span id="totalPlatesCount">0</span>
+                                </span>
+                                <button id="nextPlateBtn" class="btn btn-sm btn-secondary" disabled>▶</button>
+                            </div>
+                        </div>
+                        <div class="w-full aspect-[280/210] bg-gray-50 rounded-lg flex items-center justify-center border-2 border-dashed">
+                            <canvas id="optimizationCanvas" class="w-full h-full"></canvas>
+                        </div>
+                        <div class="mt-4 grid grid-cols-2 gap-2">
+                            <div class="input-group">
+                                <label for="plateWidth">Plaka Genişlik (mm)</label>
+                                <input type="number" id="plateWidth" value="2800">
+                            </div>
+                            <div class="input-group">
+                                <label for="plateHeight">Plaka Yükseklik (mm)</label>
+                                <input type="number" id="plateHeight" value="2100">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <h3 class="font-bold text-gray-700 mb-3">Kesim Listesi</h3>
+                        <div id="cuttingListContainer" class="overflow-y-auto max-h-96">
+                           <!-- Cutting list tables will be inserted here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- GLOBAL LIBS ---
+        const { jsPDF } = window.jspdf;
+
+        // --- DOM ELEMENT SELECTORS ---
+        const getEl = (id) => document.getElementById(id);
+        const projectTitle = getEl('projectTitle');
+        const saveProjectBtn = getEl('saveProjectBtn');
+        const loadProjectBtn = getEl('loadProjectBtn');
+        const newProjectBtn = getEl('newProjectBtn');
+        const quickCalculateBtn = getEl('quickCalculateBtn');
+        const calculateBtn = getEl('calculateBtn');
+        const exportBtn = getEl('exportBtn');
+        const prevPlateBtn = getEl('prevPlateBtn');
+        const nextPlateBtn = getEl('nextPlateBtn');
+        const cabinetForm = getEl('cabinetForm');
+        const formSubmitButton = getEl('formSubmitButton');
+        const formCancelButton = getEl('formCancelButton');
+        const projeListesi = getEl('projeListesi');
+        const cuttingListContainer = getEl('cuttingListContainer');
+        const optimizationCanvas = getEl('optimizationCanvas');
+        const modalOverlay = getEl('customModal');
+        const modalTitle = getEl('modalTitle');
+        const modalBody = getEl('modalBody');
+        const modalActions = getEl('modalActions');
+        const totalCabinets = getEl('totalCabinets');
+        const totalVolume = getEl('totalVolume');
+        const statsContainer = getEl('statsContainer');
+        const currentPlate = getEl('currentPlate');
+        const totalPlatesCount = getEl('totalPlatesCount');
+        const platePlanHeader = getEl('plate-plan-header');
+        const formBasligi = getEl('formBasligi');
+        const kabinTipi = getEl('kabinTipi');
+        const kabinAdi = getEl('kabinAdi');
+        const genislik = getEl('genislik');
+        const yukseklik = getEl('yukseklik');
+        const derinlik = getEl('derinlik');
+        const rafSayisi = getEl('rafSayisi');
+        const kapakSayisi = getEl('kapakSayisi');
+        const cekmeceSayisi = getEl('cekmeceSayisi');
+        const arkalikTipi = getEl('arkalikTipi');
+        const kenarBantiUygula = getEl('kenarBantiUygula');
+        const rafInputDiv = getEl('rafInputDiv');
+        const kapakInputDiv = getEl('kapakInputDiv');
+        const cekmeceInputDiv = getEl('cekmeceInputDiv');
+        const birlesimTipi = getEl('birlesimTipi');
+        const govdeKalinligi = getEl('govdeKalinligi');
+        const arkalikKalinligi = getEl('arkalikKalinligi');
+        const testerePayi = getEl('testerePayi');
+        const kenarBandi = getEl('kenarBandi');
+        const fugaBosluk = getEl('fugaBosluk');
+        const rayBosluk = getEl('rayBosluk');
+        const rayBoslukDiv = getEl('rayBoslukDiv');
+        const plateWidth = getEl('plateWidth');
+        const plateHeight = getEl('plateHeight');
+
+        // --- PROJECT STATE ---
+        let projectData = {};
+
+        const defaultProjectData = () => ({
+            title: "Yeni Proje",
+            cabinets: [],
+            settings: {
+                jointType: "yandan", bodyThickness: 18, backThickness: 3, sawBlade: 3,
+                edgeBand: 0.4, gap: 2, railGap: 26, plateWidth: 2800, plateHeight: 2100
+            },
+            optimization: {
+                plates: [], currentPlateIndex: 0, wasteInfo: {}
+            }
+        });
+
+        // --- INITIALIZATION ---
+        function init() {
+            loadProject();
+            setupEventListeners();
+            updateUI();
+        }
+
+        // --- EVENT LISTENERS ---
+        function setupEventListeners() {
+            saveProjectBtn.addEventListener('click', saveProject);
+            loadProjectBtn.addEventListener('click', () => { showModal("Proje Yükle", "Kaydedilmemiş değişiklikler kaybolacak. Emin misiniz?", [{ text: 'Vazgeç', class: 'btn-secondary', action: hideModal }, { text: 'Evet, Yükle', class: 'btn-warning', action: () => { loadProject(); updateUI(); hideModal(); } }]) });
+            newProjectBtn.addEventListener('click', confirmNewProject);
+            projectTitle.addEventListener('click', editProjectTitle);
+            quickCalculateBtn.addEventListener('click', () => { calculateOptimization(); optimizationCanvas.scrollIntoView({behavior: 'smooth'})});
+            calculateBtn.addEventListener('click', calculateOptimization);
+            exportBtn.addEventListener('click', exportResultsToPDF);
+            prevPlateBtn.addEventListener('click', showPreviousPlate);
+            nextPlateBtn.addEventListener('click', showNextPlate);
+            kabinTipi.addEventListener('change', updateFormFields);
+            formSubmitButton.addEventListener('click', handleFormSubmit);
+            formCancelButton.addEventListener('click', resetForm);
+            modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) hideModal(); });
+            [plateWidth, plateHeight, birlesimTipi, govdeKalinligi, arkalikKalinligi, testerePayi, kenarBandi, fugaBosluk, rayBosluk].forEach(el => {
+                el.addEventListener('change', updateSettings);
+            });
+        }
+
+        // --- UI & STATE MANAGEMENT ---
+        function updateUI() {
+            projectTitle.textContent = projectData.title;
+            Object.keys(projectData.settings).forEach(key => {
+                const elName = {jointType: 'birlesimTipi', bodyThickness: 'govdeKalinligi', backThickness: 'arkalikKalinligi', sawBlade: 'testerePayi', edgeBand: 'kenarBandi', gap: 'fugaBosluk', railGap: 'rayBosluk', plateWidth: 'plateWidth', plateHeight: 'plateHeight'}[key];
+                const el = getEl(elName);
+                if (el) el.value = projectData.settings[key];
+            });
+            renderCabinetList();
+            updateStats();
+            renderCuttingList();
+            drawCurrentPlate();
+            updatePlateNavigation();
+            updateFormFields();
+        }
+
+        function updateSettings() {
+            projectData.settings = {
+                jointType: birlesimTipi.value,
+                bodyThickness: parseFloat(govdeKalinligi.value),
+                backThickness: parseFloat(arkalikKalinligi.value),
+                sawBlade: parseFloat(testerePayi.value),
+                edgeBand: parseFloat(kenarBandi.value),
+                gap: parseFloat(fugaBosluk.value),
+                railGap: parseFloat(rayBosluk.value),
+                plateWidth: parseFloat(plateWidth.value),
+                plateHeight: parseFloat(plateHeight.value)
+            };
+        }
+
+        // --- PROJECT HANDLING ---
+        function saveProject() {
+            localStorage.setItem('ensarMobilyaProject', JSON.stringify(projectData));
+            showToast("Proje başarıyla kaydedildi.");
+        }
+
+        function loadProject() {
+            const saved = localStorage.getItem('ensarMobilyaProject');
+            projectData = saved ? JSON.parse(saved) : defaultProjectData();
+        }
+
+        function confirmNewProject() {
+            showModal("Yeni Proje", "Mevcut projedeki tüm veriler silinecek. Emin misiniz?", [
+                { text: 'Vazgeç', class: 'btn-secondary', action: hideModal },
+                { text: 'Evet, Yeni Proje', class: 'btn-danger', action: () => {
+                    projectData = defaultProjectData();
+                    updateUI();
+                    hideModal();
+                    showToast("Yeni proje oluşturuldu.");
+                }}
+            ]);
+        }
+
+        function editProjectTitle() {
+            showPromptModal("Proje Adını Düzenle", "Yeni proje adını girin:", projectData.title, (newTitle) => {
+                if (newTitle && newTitle.trim() !== "") {
+                    projectData.title = newTitle.trim();
+                    projectTitle.textContent = projectData.title;
+                    showToast("Proje adı güncellendi.");
+                }
+            });
+        }
+
+        // --- CABINET FORM & LIST ---
+        function handleFormSubmit() {
+            const editingId = formSubmitButton.dataset.editingId;
+            const cabinet = {
+                id: editingId || Date.now().toString(),
+                type: kabinTipi.value,
+                name: kabinAdi.value.trim() || `Kabin ${projectData.cabinets.length + 1}`,
+                width: parseFloat(genislik.value), height: parseFloat(yukseklik.value), depth: parseFloat(derinlik.value),
+                shelves: kabinTipi.value === "cekmeceli" ? 0 : parseInt(rafSayisi.value),
+                doors: kabinTipi.value === "cekmeceli" ? 0 : parseInt(kapakSayisi.value),
+                drawers: kabinTipi.value === "cekmeceli" ? parseInt(cekmeceSayisi.value) : 0,
+                backType: arkalikTipi.value, applyEdgeBand: kenarBantiUygula.checked
+            };
+
+            if (editingId) {
+                const index = projectData.cabinets.findIndex(c => c.id === editingId);
+                projectData.cabinets[index] = cabinet;
+            } else {
+                projectData.cabinets.push(cabinet);
+            }
+            
+            updateUI();
+            resetForm();
+        }
+
+        function resetForm() {
+            cabinetForm.reset();
+            updateFormFields();
+            formBasligi.textContent = 'Yeni Kabin Ekle';
+            formSubmitButton.textContent = "➕ Kabini Projeye Ekle";
+            formCancelButton.classList.add('hidden');
+            delete formSubmitButton.dataset.editingId;
+        }
+
+        function editCabinet(id) {
+            const cabinet = projectData.cabinets.find(c => c.id === id);
+            if (!cabinet) return;
+            kabinTipi.value = cabinet.type; kabinAdi.value = cabinet.name;
+            genislik.value = cabinet.width; yukseklik.value = cabinet.height; derinlik.value = cabinet.depth;
+            cekmeceSayisi.value = cabinet.drawers; rafSayisi.value = cabinet.shelves; kapakSayisi.value = cabinet.doors;
+            arkalikTipi.value = cabinet.backType; kenarBantiUygula.checked = cabinet.applyEdgeBand;
+            
+            updateFormFields();
+            formBasligi.textContent = `Düzenle: ${cabinet.name}`;
+            formSubmitButton.textContent = "✔️ Değişiklikleri Kaydet";
+            formCancelButton.classList.remove('hidden');
+            formSubmitButton.dataset.editingId = id;
+            formBasligi.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function deleteCabinet(id) {
+            showModal("Kabin Silinecek", "Bu kabini silmek istediğinize emin misiniz?", [
+                { text: 'Vazgeç', class: 'btn-secondary', action: hideModal },
+                { text: 'Evet, Sil', class: 'btn-danger', action: () => {
+                    projectData.cabinets = projectData.cabinets.filter(c => c.id !== id);
+                    updateUI();
+                    hideModal();
+                }}
+            ]);
+        }
+
+        function renderCabinetList() {
+            projeListesi.innerHTML = '';
+            if (projectData.cabinets.length === 0) {
+                projeListesi.innerHTML = `<div class="text-center py-8 text-gray-500"><div class="text-5xl mb-4">📦</div><p class="font-medium">Henüz kabin eklenmedi</p></div>`;
+                return;
+            }
+            projectData.cabinets.forEach(cabinet => {
+                const el = document.createElement('div');
+                el.className = 'cabinet-item';
+                el.innerHTML = `<div class="flex justify-between items-start mb-2"><h3 class="font-bold text-lg text-gray-800">${cabinet.name}</h3><button class="btn btn-sm btn-danger btn-icon delete-cabinet" data-id="${cabinet.id}">🗑️</button></div><div class="grid grid-cols-3 gap-2 text-sm"><div><div class="text-gray-500">G</div><div class="font-medium">${cabinet.width}cm</div></div><div><div class="text-gray-500">Y</div><div class="font-medium">${cabinet.height}cm</div></div><div><div class="text-gray-500">D</div><div class="font-medium">${cabinet.depth}cm</div></div></div>`;
+                projeListesi.appendChild(el);
+                el.querySelector('.delete-cabinet').addEventListener('click', (e) => { e.stopPropagation(); deleteCabinet(cabinet.id); });
+                el.addEventListener('click', () => editCabinet(cabinet.id));
+            });
+        }
+        
+        function updateFormFields() {
+            const type = kabinTipi.value;
+            rafInputDiv.classList.toggle('hidden', type === 'cekmeceli');
+            kapakInputDiv.classList.toggle('hidden', type === 'cekmeceli');
+            cekmeceInputDiv.classList.toggle('hidden', type !== 'cekmeceli');
+            rayBoslukDiv.classList.toggle('hidden', type !== 'cekmeceli');
+        }
+
+        // --- CALCULATION & OPTIMIZATION ---
+        function getAllParts() {
+            let parts = [];
+            const s = projectData.settings;
+            projectData.cabinets.forEach(cab => {
+                const {width: G, height: Y, depth: D} = cab;
+                const {bodyThickness: GK, backThickness: AK, gap: F, jointType: BT, backType: AT} = s;
+                const g=G*10, y=Y*10, d=D*10;
+                let yanY, ustAltG, ustAltD = d;
+                if(BT==='yandan'){yanY=y; ustAltG=g-(2*GK);}else{yanY=y-(2*GK); ustAltG=g;}
+                parts.push({name:'Yan Tabla', w:yanY, h:ustAltD, count:2, cab:cab.name, thickness: GK});
+                parts.push({name:'Üst/Alt Tabla', w:ustAltG, h:ustAltD, count:2, cab:cab.name, thickness: GK});
+                let arkG, arkY;
+                if(AT==='kanalli'){arkG=g-GK; arkY=y-GK;}else{arkG=g-(2*GK); arkY=y-(2*GK);}
+                parts.push({name:'Arkalık', w:arkG, h:arkY, count:1, cab:cab.name, thickness: AK});
+                if(cab.type==='standart'){
+                    if(cab.shelves>0){parts.push({name:'Raf', w:g-(2*GK), h:d-GK-(AT==='kanalli'?10:0)-AK, count:cab.shelves, cab:cab.name, thickness: GK});}
+                    if(cab.doors>0){parts.push({name:'Kapak', w:(g-(cab.doors+1)*F)/cab.doors, h:y-(2*F), count:cab.doors, cab:cab.name, thickness: GK});}
+                } else {
+                    const cekmeceOnY=(y-(cab.drawers+1)*F)/cab.drawers;
+                    const kasaG=g-(2*GK)-s.railGap;
+                    const kasaD=d-GK-(AT==='kanalli'?10:0)-AK;
+                    parts.push({name:'Çekmece Önü', w:g-(2*F), h:cekmeceOnY, count:cab.drawers, cab:cab.name, thickness: GK});
+                    parts.push({name:'Çekmece Kasa Yan', w:kasaD, h:cekmeceOnY-20, count:cab.drawers*2, cab:cab.name, thickness: GK});
+                    parts.push({name:'Çekmece Kasa Ön/Arka', w:kasaG-(2*GK), h:cekmeceOnY-20, count:cab.drawers*2, cab:cab.name, thickness: GK});
+                    parts.push({name:'Çekmece Altı', w:kasaG-(2*GK), h:kasaD, count:cab.drawers, cab:cab.name, thickness: AK});
+                }
+            });
+            return parts.flatMap(p => Array(p.count).fill({...p, w: Math.round(p.w), h: Math.round(p.h)}));
+        }
+
+        function calculateOptimization() {
+            if (projectData.cabinets.length === 0) {
+                showModal("Uyarı", "Hesaplama yapmak için önce bir kabin eklemelisiniz.", [{ text: 'Tamam', class: 'btn-primary', action: hideModal }]);
+                return;
+            }
+            updateSettings();
+            const allParts = getAllParts();
+
+            // Group parts by thickness
+            const partsByThickness = allParts.reduce((acc, part) => {
+                const key = part.thickness;
+                if (!acc[key]) acc[key] = [];
+                acc[key].push(part);
+                return acc;
+            }, {});
+
+            let allPackedPlates = [];
+            let wasteInfo = {};
+            
+            // Pack each group separately
+            for (const thickness in partsByThickness) {
+                const partsGroup = partsByThickness[thickness];
+                const packedPlatesGroup = packPartsMaximalRectangles(partsGroup, projectData.settings.plateWidth, projectData.settings.plateHeight);
+                
+                packedPlatesGroup.forEach(plate => {
+                    plate.thickness = parseFloat(thickness);
+                    allPackedPlates.push(plate);
+                });
+
+                wasteInfo[thickness] = calculateTotalWasteForGroup(packedPlatesGroup, partsGroup);
+            }
+            
+            projectData.optimization.plates = allPackedPlates;
+            projectData.optimization.currentPlateIndex = 0;
+            projectData.optimization.wasteInfo = wasteInfo;
+
+            updateUI();
+            showToast("Optimizasyon tamamlandı!");
+        }
+
+        function packPartsMaximalRectangles(parts, plateW, plateH) {
+            parts.sort((a, b) => (b.w * b.h) - (a.w * a.h));
+            let plates = [];
+            let remainingParts = [...parts];
+            
+            while (remainingParts.length > 0) {
+                let plate = { w: plateW, h: plateH, parts: [], freeRects: [{x: 0, y: 0, w: plateW, h: plateH}] };
+                let placedOnThisPlate = true;
+
+                while(placedOnThisPlate) {
+                    placedOnThisPlate = false;
+                    let bestPartIndex = -1, bestRectIndex = -1, bestScore = Infinity, rotated = false;
+
+                    for (let i = 0; i < remainingParts.length; i++) {
+                        const part = remainingParts[i];
+                        for (let j = 0; j < plate.freeRects.length; j++) {
+                            const rect = plate.freeRects[j];
+                            // Try regular
+                            if (part.w <= rect.w && part.h <= rect.h) {
+                                const score = rect.w * rect.h - part.w * part.h;
+                                if (score < bestScore) {
+                                    bestScore = score; bestPartIndex = i; bestRectIndex = j; rotated = false;
+                                }
+                            }
+                            // Try rotated
+                            if (part.h <= rect.w && part.w <= rect.h) {
+                                const score = rect.w * rect.h - part.h * part.w;
+                                if (score < bestScore) {
+                                    bestScore = score; bestPartIndex = i; bestRectIndex = j; rotated = true;
+                                }
+                            }
+                        }
+                    }
+
+                    if (bestPartIndex !== -1) {
+                        const partToPlace = remainingParts[bestPartIndex];
+                        const rect = plate.freeRects.splice(bestRectIndex, 1)[0];
+                        const partW = rotated ? partToPlace.h : partToPlace.w;
+                        const partH = rotated ? partToPlace.w : partToPlace.h;
+
+                        plate.parts.push({...partToPlace, x: rect.x, y: rect.y, w: partW, h: partH, rotated: rotated});
+                        
+                        const right = {x: rect.x + partW, y: rect.y, w: rect.w - partW, h: partH};
+                        const bottom = {x: rect.x, y: rect.y + partH, w: rect.w, h: rect.h - partH};
+                        
+                        if (right.w > 0 && right.h > 0) plate.freeRects.push(right);
+                        if (bottom.w > 0 && bottom.h > 0) plate.freeRects.push(bottom);
+
+                        remainingParts.splice(bestPartIndex, 1);
+                        placedOnThisPlate = true;
+                    }
+                }
+                
+                if (plate.parts.length > 0) {
+                    plates.push(plate);
+                } else if (remainingParts.length > 0) {
+                    showModal("Hata", `${remainingParts[0].w}x${remainingParts[0].h} boyutundaki parça plakalara sığdırılamadı.`, 
+                              [{text: 'Tamam', class:'btn-primary', action: hideModal}]);
+                    break;
+                }
+            }
+            return plates;
+        }
+
+        function calculateTotalWasteForGroup(plates, partsInGroup) {
+            if (plates.length === 0) return 0;
+            const totalPlateArea = plates.length * projectData.settings.plateWidth * projectData.settings.plateHeight;
+            const totalPartsArea = partsInGroup.reduce((sum, part) => sum + (part.w * part.h), 0);
+            if (totalPlateArea === 0) return 0;
+            const wastePercentage = ((totalPlateArea - totalPartsArea) / totalPlateArea * 100);
+            return Math.max(0, Math.round(wastePercentage * 10) / 10);
+        }
+
+        // --- RENDERING & EXPORT ---
+        async function exportResultsToPDF() {
+            if (projectData.optimization.plates.length === 0) {
+                showModal("Hata", "Dışa aktarılacak veri yok. Lütfen önce 'Hesapla' butonuna tıklayın.", [{text: 'Tamam', class:'btn-primary', action: hideModal}]);
+                return;
+            }
+
+            const doc = new jsPDF();
+            
+            doc.setFontSize(20);
+            doc.text(`Proje Raporu: ${projectData.title}`, 14, 22);
+            doc.setFontSize(11);
+            doc.text(`Oluşturma Tarihi: ${new Date().toLocaleDateString('tr-TR')}`, 14, 30);
+
+            const summaryBody = [
+                ['Toplam Kabin Sayısı', totalCabinets.textContent],
+                ['Toplam Hacim (m³)', totalVolume.textContent],
+            ];
+            const wasteInfo = projectData.optimization.wasteInfo;
+            for(const thickness in wasteInfo) {
+                const platesForThickness = projectData.optimization.plates.filter(p => p.thickness == thickness).length;
+                summaryBody.push([`${thickness}mm Plaka Sayısı`, platesForThickness]);
+                summaryBody.push([`${thickness}mm Fire Oranı (%)`, `${wasteInfo[thickness]}%`]);
+            }
+
+            doc.autoTable({ startY: 35, head: [['Özet Bilgiler', 'Değer']], body: summaryBody, theme: 'grid' });
+
+            const groupedParts = getGroupedParts();
+            const partsByThickness = Object.values(groupedParts).reduce((acc, part) => {
+                const key = part.thickness;
+                if (!acc[key]) acc[key] = [];
+                acc[key].push(part);
+                return acc;
+            }, {});
+
+            let lastY = doc.lastAutoTable.finalY;
+            for (const thickness in partsByThickness) {
+                doc.autoTable({
+                    startY: lastY + 10,
+                    head: [[`Kesim Listesi (${thickness}mm Malzeme)`], ['Parça Adı', 'Adet', 'Ölçü (mm)', 'Ait Olduğu Kabin']],
+                    body: partsByThickness[thickness].map(p => [p.name, p.count, `${p.w} x ${p.h}`, p.cab]),
+                    theme: 'striped',
+                    didDrawPage: (data) => { lastY = data.cursor.y; }
+                });
+                lastY = doc.lastAutoTable.finalY;
+            }
+
+            const platesByThickness = projectData.optimization.plates.reduce((acc, plate) => {
+                const key = plate.thickness;
+                if (!acc[key]) acc[key] = [];
+                acc[key].push(plate);
+                return acc;
+            }, {});
+
+            for (const thickness in platesByThickness) {
+                const plates = platesByThickness[thickness];
+                for(let i = 0; i < plates.length; i++) {
+                    doc.addPage();
+                    doc.setFontSize(16);
+                    doc.text(`Plaka Kesim Şeması (${thickness}mm) - Plaka ${i + 1} / ${plates.length}`, 14, 22);
+                    const tempCanvas = document.createElement('canvas');
+                    const plateData = await drawPlateOnCanvas(tempCanvas, plates[i], 800);
+                    if (plateData) {
+                        doc.addImage(plateData, 'PNG', 14, 30, 180, 135);
+                    }
+                }
+            }
+
+            doc.save(`${projectData.title.replace(/ /g, '_')}_rapor.pdf`);
+            showToast("PDF raporu başarıyla oluşturuldu.");
+        }
+
+        async function drawPlateOnCanvas(canvas, plate, width) {
+            return new Promise(resolve => {
+                if (!plate) {
+                    const ctx = canvas.getContext('2d');
+                    const rect = canvas.parentElement.getBoundingClientRect();
+                    canvas.width = rect.width; canvas.height = rect.height;
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = '#6b7280'; ctx.font = '16px Inter';
+                    ctx.textAlign = 'center'; ctx.fillText('Hesaplama bekleniyor...', canvas.width / 2, canvas.height / 2);
+                    resolve(null); return;
+                }
+                
+                const aspectRatio = plate.h / plate.w;
+                canvas.width = width; canvas.height = width * aspectRatio;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#f8fafc'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                const scale = canvas.width / plate.w;
+                ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2;
+                ctx.strokeRect(0, 0, plate.w * scale, plate.h * scale);
+                
+                const colors = ['#bfdbfe', '#bae6fd', '#a7f3d0', '#fef08a', '#fecaca', '#ddd6fe', '#fbcfe8'];
+                plate.parts.forEach((part, i) => {
+                    ctx.fillStyle = colors[i % colors.length];
+                    ctx.fillRect(part.x * scale, part.y * scale, part.w * scale, part.h * scale);
+                    ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 1;
+                    ctx.strokeRect(part.x * scale, part.y * scale, part.w * scale, part.h * scale);
+                    const minDim = Math.min(part.w * scale, part.h * scale);
+                    if (minDim > 25) {
+                        ctx.fillStyle = '#1e293b';
+                        const fontSize = Math.min(12, minDim * 0.25);
+                        ctx.font = `bold ${fontSize}px Inter`;
+                        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                        ctx.fillText(`${part.w}×${part.h}`, (part.x + part.w/2) * scale, (part.y + part.h/2) * scale);
+                    }
+                });
+                
+                ctx.fillStyle = '#64748b'; ctx.font = 'bold 12px Inter';
+                ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
+                ctx.fillText(`${plate.w}×${plate.h} mm`, canvas.width - 5, canvas.height - 5);
+                
+                resolve(canvas.toDataURL('image/png'));
+            });
+        }
+
+        function drawCurrentPlate() {
+            const plate = projectData.optimization.plates[projectData.optimization.currentPlateIndex];
+            drawPlateOnCanvas(optimizationCanvas, plate, optimizationCanvas.parentElement.clientWidth);
+            if(plate) {
+                platePlanHeader.querySelector('h3').textContent = `Plaka Kesim Planı (${plate.thickness}mm)`;
+            } else {
+                platePlanHeader.querySelector('h3').textContent = `Plaka Kesim Planı`;
+            }
+        }
+
+        function getGroupedParts() {
+            const allParts = getAllParts();
+            if (allParts.length === 0) return {};
+            return allParts.reduce((acc, p) => {
+                const key = `${p.w}x${p.h}-${p.name}-${p.cab}-${p.thickness}`;
+                if (!acc[key]) acc[key] = { ...p, count: 0 };
+                acc[key].count++;
+                return acc;
+            }, {});
+        }
+
+        function renderCuttingList() {
+            cuttingListContainer.innerHTML = '';
+            const groupedParts = getGroupedParts();
+            const partsByThickness = Object.values(groupedParts).reduce((acc, part) => {
+                const key = part.thickness;
+                if (!acc[key]) acc[key] = [];
+                acc[key].push(part);
+                return acc;
+            }, {});
+
+            if (Object.keys(partsByThickness).length === 0) {
+                cuttingListContainer.innerHTML = `<p class="text-center py-4 text-gray-500">Kesilecek parça yok.</p>`;
+                return;
+            }
+
+            for (const thickness in partsByThickness) {
+                const table = document.createElement('table');
+                table.className = "min-w-full divide-y divide-gray-200 table-sticky-header mb-6";
+                let tableHtml = `
+                    <thead class="bg-gray-100">
+                        <tr><th colspan="4" class="px-4 py-2 text-left text-sm font-bold text-gray-700">${thickness}mm Malzeme</th></tr>
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Parça Adı</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Adet</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ölçü (mm)</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kabin</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                `;
+                partsByThickness[thickness].sort((a,b) => b.w - a.w).forEach(part => {
+                    tableHtml += `<tr>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-800">${part.name}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${part.count}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-mono">${part.w} x ${part.h}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${part.cab}</td>
+                    </tr>`;
+                });
+                tableHtml += `</tbody>`;
+                table.innerHTML = tableHtml;
+                cuttingListContainer.appendChild(table);
+            }
+        }
+
+        function updatePlateNavigation() {
+            const plates = projectData.optimization.plates;
+            const index = projectData.optimization.currentPlateIndex;
+            const total = plates.length;
+            
+            currentPlate.textContent = total > 0 ? index + 1 : 0;
+            totalPlatesCount.textContent = total;
+            prevPlateBtn.disabled = index <= 0;
+            nextPlateBtn.disabled = index >= total - 1;
+        }
+
+        function showPreviousPlate() {
+            if (projectData.optimization.currentPlateIndex > 0) {
+                projectData.optimization.currentPlateIndex--;
+                updateUI();
+            }
+        }
+
+        function showNextPlate() {
+            if (projectData.optimization.currentPlateIndex < projectData.optimization.plates.length - 1) {
+                projectData.optimization.currentPlateIndex++;
+                updateUI();
+            }
+        }
+
+        function updateStats() {
+            totalCabinets.textContent = projectData.cabinets.length;
+            totalVolume.textContent = projectData.cabinets.reduce((acc, cab) => acc + (cab.width*cab.height*cab.depth)/1000000, 0).toFixed(2);
+            
+            statsContainer.innerHTML = '';
+            const wasteInfo = projectData.optimization.wasteInfo;
+            if (Object.keys(wasteInfo).length === 0) {
+                statsContainer.innerHTML = `<div class="stats-card md:col-span-2"><div class="text-gray-500">Hesaplama bekleniyor...</div></div>`;
+                return;
+            }
+            for (const thickness in wasteInfo) {
+                const platesForThickness = projectData.optimization.plates.filter(p => p.thickness == thickness).length;
+                const statsHtml = `
+                    <div class="stats-card">
+                        <div class="text-sm font-medium text-gray-500 mb-1">${thickness}mm Plaka Sayısı</div>
+                        <div class="text-3xl font-bold text-blue-600">${platesForThickness}</div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="text-sm font-medium text-gray-500 mb-1">${thickness}mm Fire Oranı</div>
+                        <div class="text-3xl font-bold text-red-600">${wasteInfo[thickness]}%</div>
+                    </div>
+                `;
+                statsContainer.innerHTML += statsHtml;
+            }
+        }
+
+        // --- UTILITIES ---
+        function showModal(title, body, actions = []) {
+            modalTitle.textContent = title;
+            modalBody.innerHTML = body;
+            modalActions.innerHTML = '';
+            actions.forEach(action => {
+                const button = document.createElement('button');
+                button.textContent = action.text;
+                button.className = `btn ${action.class}`;
+                button.onclick = action.action;
+                modalActions.appendChild(button);
+            });
+            modalOverlay.classList.add('visible');
+        }
+
+        function showPromptModal(title, body, initialValue, callback) {
+            modalTitle.textContent = title;
+            modalBody.innerHTML = `<p class="mb-2">${body}</p><input type="text" id="modalInput" class="w-full p-2 border border-gray-300 rounded-md" value="${initialValue}">`;
+            modalActions.innerHTML = '';
+            const okButton = document.createElement('button');
+            okButton.textContent = 'Tamam';
+            okButton.className = 'btn btn-primary';
+            okButton.onclick = () => {
+                const value = getEl('modalInput').value;
+                callback(value);
+                hideModal();
+            };
+            const cancelButton = document.createElement('button');
+            cancelButton.textContent = 'İptal';
+            cancelButton.className = 'btn btn-secondary';
+            cancelButton.onclick = hideModal;
+            modalActions.appendChild(cancelButton);
+            modalActions.appendChild(okButton);
+            modalOverlay.classList.add('visible');
+            getEl('modalInput').focus();
+        }
+
+        function hideModal() {
+            modalOverlay.classList.remove('visible');
+        }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-5 right-5 bg-gray-800 text-white py-3 px-5 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-[1100]';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.classList.remove('translate-y-20', 'opacity-0'), 10);
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+                setTimeout(() => toast.remove(), 3000);
+            }, 3000);
+        }
+
+        // --- RUN APP ---
+        init();
+    });
+    </script>
+</body>
+</html>
+
