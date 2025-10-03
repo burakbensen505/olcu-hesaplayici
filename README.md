@@ -1,4 +1,4 @@
-Ensar Mobilya - Proje Hesaplayıcı Pro v4
+
 
 Mobilya üreticileri ve hobi amaçlı marangozlar için geliştirilmiş, web tabanlı bir kabin (modül) ölçülendirme ve plaka kesim optimizasyon aracıdır. Bu proje, malzeme fire oranını en aza indirerek maliyetleri düşürmeyi ve üretim sürecini hızlandırmayı hedefler. Uygulama, tüm işlemleri tarayıcı üzerinde yerel olarak gerçekleştirir ve herhangi bir sunucuya ihtiyaç duymaz.
 
